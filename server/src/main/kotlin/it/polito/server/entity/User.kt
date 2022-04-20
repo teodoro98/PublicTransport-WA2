@@ -2,14 +2,19 @@ package it.polito.server.entity
 
 import javax.persistence.*
 
-@Entity
-@Table(name = "Users")
-class User {
 
+@Entity
+@Table(name = "users")
+class User (
+    @OneToOne(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
+    var activation: Activation?
+   ) {
+    var name : String = ""
+    var email: String = ""
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
-        generator = "student_generator")
-    @SequenceGenerator(name="student_generator",
+        generator = "user_generator")
+    @SequenceGenerator(name="user_generator",
         sequenceName = "sequence_1",
         initialValue = 1,
         allocationSize = 1)
