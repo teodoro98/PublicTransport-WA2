@@ -9,7 +9,3 @@ data class ActivationDTO(
     val counter:Long,
     val user:User
 )
-
-fun Activation.toDTO(): ActivationDTO{
-    return ActivationDTO(id, counter, user)
-}

@@ -1,5 +1,6 @@
 package it.polito.server.entity
 
+import it.polito.server.dto.UserDTO
 import javax.persistence.*
 
 
@@ -22,5 +23,8 @@ class User (
     @Column(updatable = false, nullable = false)
     var id : Long? = null
 
-
+    fun toDTO(): UserDTO {
+        return UserDTO(id, name, email)
+    }
 }
+

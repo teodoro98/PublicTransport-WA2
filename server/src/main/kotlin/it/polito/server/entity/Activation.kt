@@ -1,5 +1,6 @@
 package it.polito.server.entity
 
+import it.polito.server.dto.ActivationDTO
 import org.hibernate.annotations.GenericGenerator
 import java.util.UUID
 import javax.persistence.Column
@@ -26,4 +27,10 @@ class Activation(
     @GenericGenerator(name="uuid2", strategy="uuid2")
     var id : UUID? = null
 
+
+    fun toDTO(): ActivationDTO {
+        return ActivationDTO(id, counter, user)
+    }
 }
+
+
