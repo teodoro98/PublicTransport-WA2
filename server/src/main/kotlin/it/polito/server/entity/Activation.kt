@@ -17,9 +17,10 @@ import javax.persistence.Table
 class Activation(
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    var user: User
-    ) {
+    var user: User,
     var counter : Long = 5
+    ) {
+
 
     @Id
     @Column(updatable = false, nullable = false)

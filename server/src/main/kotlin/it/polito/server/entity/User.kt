@@ -7,6 +7,7 @@ import javax.persistence.*
 @Entity
 @Table(name = "users")
 class User (
+
     @OneToOne(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
     var activation: Activation?,
     var name: String,

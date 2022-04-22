@@ -8,6 +8,3 @@ data class UserDTO(
     val email:String
     )
 
-fun User.toDTO(): UserDTO{
-    return UserDTO(id, name, email)
-}
