@@ -1,7 +1,11 @@
 package it.polito.server.service
 
-import org.springframework.stereotype.Service
+import it.polito.server.dto.UserDTO
 
-@Service
-class UserService {
+interface UserService {
+
+    fun validateUser(user: UserDTO)
+
+    fun registerUser(user: UserDTO)
+
 }

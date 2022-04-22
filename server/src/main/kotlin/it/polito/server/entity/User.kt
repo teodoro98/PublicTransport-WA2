@@ -7,10 +7,11 @@ import javax.persistence.*
 @Table(name = "users")
 class User (
     @OneToOne(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
-    var activation: Activation?
+    var activation: Activation?,
+    var name: String,
+    var email: String
    ) {
-    var name : String = ""
-    var email: String = ""
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
         generator = "user_generator")
