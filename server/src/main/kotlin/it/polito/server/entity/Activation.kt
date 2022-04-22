@@ -21,7 +21,7 @@ class Activation(
     var counter : Long = 5
 
     @Id
-    @Column(columnDefinition = "CHAR(32)",updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name="uuid2", strategy="uuid2")
     var id : UUID? = null
