@@ -6,6 +6,6 @@ interface UserService {
 
     fun validateUser(user: UserDTO)
 
-    fun registerUser(user: UserDTO)
+    fun registerUser(user: UserDTO) : UserDTO
 
 }
