@@ -2,6 +2,7 @@ package it.polito.server.entity
 
 import it.polito.server.dto.ActivationDTO
 import org.hibernate.annotations.GenericGenerator
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -18,9 +19,16 @@ class Activation(
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     var user: User,
-    var counter : Long = 5
+
+    @Column(updatable = false, nullable = false)
+    var token : Long,
+    @Column(updatable = false, nullable = false)
+    var deadline : LocalDateTime,
+
     ) {
 
+    @Column(updatable = true, nullable = false)
+    var counter : Long = 5
 
     @Id
     @Column(updatable = false, nullable = false)
@@ -30,7 +38,7 @@ class Activation(
 
 
     fun toDTO(): ActivationDTO {
-        return ActivationDTO(id, counter, user)
+        return ActivationDTO(id, counter, user, token, deadline)
     }
 }
 

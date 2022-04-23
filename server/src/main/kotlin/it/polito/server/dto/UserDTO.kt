@@ -4,7 +4,9 @@ import it.polito.server.entity.User
 
 data class UserDTO(
     val id:Long?,
-    val name:String,
-    val email:String
+    val nickname:String,
+    val email:String,
+    val password: String,
+    val active: Boolean
     )
 

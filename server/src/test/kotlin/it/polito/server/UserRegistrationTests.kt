@@ -8,6 +8,8 @@ import it.polito.server.controller.UserNotUnique
 import it.polito.server.controller.UserPasswordNotStrong
 import it.polito.server.entity.Activation
 import it.polito.server.entity.User
+import it.polito.server.repository.UserRepository
+import it.polito.server.service.UserServiceImpl
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -90,4 +92,4 @@ class UserRegistrationTests {
         }
     }
 
-}
+

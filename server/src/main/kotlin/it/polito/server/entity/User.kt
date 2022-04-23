@@ -10,9 +10,20 @@ class User (
 
     @OneToOne(mappedBy = "user", cascade = arrayOf(CascadeType.ALL))
     var activation: Activation?,
-    var name: String,
-    var email: String
+
+    @Column(updatable = true, nullable = false, unique = true)
+    var nickname: String,
+
+    @Column(updatable = true, nullable = false, unique = true)
+    var email: String,
+
+    @Column(updatable = true, nullable = false, )
+    var password: String
+
    ) {
+
+    @Column(updatable = true, nullable = false, )
+    var active : Boolean = false
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
@@ -25,7 +36,7 @@ class User (
     var id : Long? = null
 
     fun toDTO(): UserDTO {
-        return UserDTO(id, name, email)
+        return UserDTO(id, nickname, email, password, active)
     }
 }
 
