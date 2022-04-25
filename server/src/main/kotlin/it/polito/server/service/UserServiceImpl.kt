@@ -1,16 +1,15 @@
 package it.polito.server.service
 
-import it.polito.server.dto.UserDTO
 import org.springframework.stereotype.Service
 import org.apache.commons.validator.EmailValidator
 import java.util.regex.*
 import it.polito.server.controller.*
+import it.polito.server.dto.*
 import it.polito.server.entity.Activation
 import it.polito.server.repository.*
 import it.polito.server.entity.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Random
 import kotlin.math.abs
@@ -28,23 +27,60 @@ class UserServiceImpl: UserService {
     private val deadline = LocalDateTime.now().plusSeconds(30)
 
 
-    override fun registerUser(user: UserDTO): UserDTO {
-        this.validateUser(user)
+    override fun registerUser(user: UserDTO): UserProvDTO {
+        this.validateUserData(user)
         try {
             var u = userRepository.save(User(null, user.nickname, user.email, user.password))
             var a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
             u.activation = a
-            u = userRepository.save(u)
-            return u.toDTO()
+            userRepository.save(u)
+            return UserProvDTO(a.id, u.email)
         } catch(ex : DataIntegrityViolationException) {
             throw UserNotUnique()
         }
     }
 
-    override fun validateUser(user: UserDTO) {
+    @Scheduled(initialDelay = 2000, fixedDelay = 2000)
+    override fun pruneExpiredActivation() {
+        val time = LocalDateTime.now()
+        activationRepository.findByDeadline(time)?.forEach { it ->
+            println(it.toString() + "DELETED")
+            it.user.id?.let { id -> userRepository.deleteById(id) }
+            //activationRepository.deleteById(it.id!!)
+        }
+
+        activationRepository.findByDeadCounter()?.forEach { it ->
+            println(it.toString() + "DELETED")
+            it.user.id?.let { id -> userRepository.deleteById(id) }
+            //activationRepository.deleteById(it.id!!)
+        }
+
+    }
+
+    override fun validateUserData(user: UserDTO) {
         if(user.nickname.isEmpty() || user.password.isEmpty() || user.email.isEmpty()) throw UserEmpty()
         if(!EmailValidator.getInstance().isValid(user.email)) throw EmailNotValid()
         if(!this.validatePassword(user.password)) throw UserPasswordNotStrong()
+    }
+
+    override fun validateUserEmail(validation: ValidationDTO): UserSlimDTO {
+        val act  = activationRepository.findById(validation.provisionalID).orElseThrow {
+            throw ActivationIDNotFound()
+        }
+        if(LocalDateTime.now() >= act.deadline) {
+            throw ActivationCodeExpired()
+        }
+        if(act.counter > 0) {
+            throw ActivationCodeExpired()
+        }
+        if(act.token != validation.activation_code) {
+            act.counter--
+            activationRepository.save(act)
+            throw ActivationCodeMismatch()
+        }
+        act.user.active = true;
+        var u = userRepository.save(act.user)
+        return u.toDTOSlim()
     }
 
     private fun validatePassword(password: String): Boolean {

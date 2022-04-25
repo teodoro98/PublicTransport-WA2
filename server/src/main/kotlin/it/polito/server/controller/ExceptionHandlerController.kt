@@ -45,5 +45,9 @@ class UserEmpty() : Exception()
 class UserNotUnique() : Exception()
 class UserPasswordNotStrong() : Exception()
 class EmailNotValid() : Exception()
+class ActivationIDNotFound() : Exception()
+class ActivationCodeMismatch() : Exception()
+class ActivationCodeExpired() : Exception()
+
 
 

@@ -1,6 +1,7 @@
 package it.polito.server.entity
 
 import it.polito.server.dto.UserDTO
+import it.polito.server.dto.UserSlimDTO
 import javax.persistence.*
 
 
@@ -37,6 +38,10 @@ class User (
 
     fun toDTO(): UserDTO {
         return UserDTO(id, nickname, email, password, active)
+    }
+
+    fun toDTOSlim(): UserSlimDTO {
+        return UserSlimDTO(id, nickname, email)
     }
 }
 
