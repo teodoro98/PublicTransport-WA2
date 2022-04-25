@@ -13,6 +13,11 @@ import org.springframework.dao.DataIntegrityViolationException
 import java.time.LocalDateTime
 import java.util.Random
 import kotlin.math.abs
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled
+
 
 @Service
 class UserServiceImpl: UserService {
@@ -89,6 +94,15 @@ class UserServiceImpl: UserService {
         val m = p.matcher(password);
         return m.matches();
     }
+
+
+}
+
+
+@Configuration
+@EnableScheduling
+@ConditionalOnProperty(name= ["scheduler.enabled"], matchIfMissing = true)
+public class SchedulerConfig {
 
 
 }

@@ -39,6 +39,25 @@ class ExceptionHandlerController: ResponseEntityExceptionHandler () {
             println("email not valid")
     }
 
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ActivationIDNotFound::class)
+    fun handleActivationIDNotFound(ex: ActivationIDNotFound,  req: WebRequest?){
+        println("activation id not found")
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ActivationCodeMismatch::class)
+    fun handleActivationCodeMismatch(ex: ActivationCodeMismatch,  req: WebRequest?) {
+        println("activation code mismatch")
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ActivationCodeExpired::class)
+    fun handleActivationCodeExpired(ex: ActivationCodeExpired,  req: WebRequest?){
+        println("activation code expired")
+    }
+
 }
 
 class UserEmpty() : Exception()
