@@ -51,12 +51,6 @@ class UserRegistrationTests {
     }
 
     @Test
-    fun prova(userRepository: UserRepository){
-        var correctUser = User(null, "Mario", "mario@gmail.com","Pwd123456&")
-        Assertions.assertDoesNotThrow{userRepository.save(correctUser)}
-    }
-
-    @Test
     fun constrainsDB() {
 
         val correctUser      =  User(null, "Mario", "mario@gmail.com","Pwd123456&").toDTO()

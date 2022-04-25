@@ -24,7 +24,7 @@ class UserServiceImpl: UserService {
     private lateinit var activationRepository : ActivationRepository
 
     // Configuration data
-    private val deadline = LocalDateTime.now().plusSeconds(30)
+    private val deadline = LocalDateTime.now().plusSeconds(2)
 
 
     override fun registerUser(user: UserDTO): UserProvDTO {
