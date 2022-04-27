@@ -13,9 +13,9 @@ import org.springframework.dao.DataIntegrityViolationException
 import java.time.LocalDateTime
 import java.util.Random
 import kotlin.math.abs
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.context.annotation.Configuration
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 
 
@@ -35,8 +35,8 @@ class UserServiceImpl: UserService {
     override fun registerUser(user: UserDTO): UserProvDTO {
         this.validateUserData(user)
         try {
-            var u = userRepository.save(User(null, user.nickname, user.email, user.password))
-            var a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
+            val u = userRepository.save(User(null, user.nickname, user.email, user.password))
+            val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
             u.activation = a
             userRepository.save(u)
             return UserProvDTO(a.id, u.email)
@@ -69,7 +69,7 @@ class UserServiceImpl: UserService {
     }
 
     override fun validateUserEmail(validation: ValidationDTO): UserSlimDTO {
-        val act  = activationRepository.findById(validation.provisionalID).orElseThrow {
+        val act  = activationRepository.findById(validation.provisional_id).orElseThrow {
             throw ActivationIDNotFound()
         }
         if(LocalDateTime.now() >= act.deadline) {
@@ -83,16 +83,16 @@ class UserServiceImpl: UserService {
             activationRepository.save(act)
             throw ActivationCodeMismatch()
         }
-        act.user.active = true;
-        var u = userRepository.save(act.user)
+        act.user.active = true
+        val u = userRepository.save(act.user)
         return u.toDTOSlim()
     }
 
     private fun validatePassword(password: String): Boolean {
         val regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8,20}$"
-        val p = Pattern.compile(regex);
-        val m = p.matcher(password);
-        return m.matches();
+        val p = Pattern.compile(regex)
+        val m = p.matcher(password)
+        return m.matches()
     }
 
 
@@ -102,7 +102,7 @@ class UserServiceImpl: UserService {
 @Configuration
 @EnableScheduling
 @ConditionalOnProperty(name= ["scheduler.enabled"], matchIfMissing = true)
-public class SchedulerConfig {
+class SchedulerConfig {
 
 
 }

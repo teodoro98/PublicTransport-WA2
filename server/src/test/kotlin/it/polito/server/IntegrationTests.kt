@@ -1,6 +1,8 @@
 package it.polito.server
 
 
+import it.polito.server.dto.UserDTO
+import it.polito.server.dto.UserSlimDTO
 import it.polito.server.entity.User
 import it.polito.server.repository.ActivationRepository
 import it.polito.server.repository.UserRepository
@@ -21,6 +23,11 @@ import org.springframework.util.Assert
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
+import kotlin.random.Random
 
 
 @Testcontainers
@@ -68,7 +75,7 @@ class IntegrationTests {
 
         //Correct case
         var response = restTemplate.postForEntity<Unit>(
-            "$baseUrl/register",
+            "$baseUrl/users/register",
             correctRequest
         )
         assert(response.statusCode == HttpStatus.CREATED)
@@ -76,21 +83,21 @@ class IntegrationTests {
 
         //Duplicated name
         response = restTemplate.postForEntity<Unit>(
-            "$baseUrl/register",
+            "$baseUrl/users/register",
             duplicatedNameRequest
         )
         assert(response.statusCode == HttpStatus.BAD_REQUEST)
 
         //Duplicated mail
         response = restTemplate.postForEntity<Unit>(
-            "$baseUrl/register",
+            "$baseUrl/users/register",
             duplicatedMailRequest
         )
         assert(response.statusCode == HttpStatus.BAD_REQUEST)
 
         //Invalid mail
         response = restTemplate.postForEntity<Unit>(
-            "$baseUrl/register",
+            "$baseUrl/users/register",
             invalidMailRequest
         )
         assert(response.statusCode == HttpStatus.BAD_REQUEST)
@@ -98,31 +105,31 @@ class IntegrationTests {
         //Check password
         //Short pwd
         response = restTemplate.postForEntity<Unit>(
-            "$baseUrl/register",
+            "$baseUrl/users/register",
             invalidPassowrdRequest1
         )
         assert(response.statusCode == HttpStatus.BAD_REQUEST)
         //No lower case
         response = restTemplate.postForEntity<Unit>(
-            "$baseUrl/register",
+            "$baseUrl/users/register",
             invalidPassowrdRequest2
         )
         assert(response.statusCode == HttpStatus.BAD_REQUEST)
         //No digit
         response = restTemplate.postForEntity<Unit>(
-            "$baseUrl/register",
+            "$baseUrl/users/register",
             invalidPassowrdRequest3
         )
         assert(response.statusCode == HttpStatus.BAD_REQUEST)
         //No special
         response = restTemplate.postForEntity<Unit>(
-            "$baseUrl/register",
+            "$baseUrl/users/register",
             invalidPassowrdRequest4
         )
         assert(response.statusCode == HttpStatus.BAD_REQUEST)
         //No upper case
         response = restTemplate.postForEntity<Unit>(
-            "$baseUrl/register",
+            "$baseUrl/users/register",
             invalidPassowrdRequest5
         )
         assert(response.statusCode == HttpStatus.BAD_REQUEST)
@@ -134,7 +141,7 @@ class IntegrationTests {
         val baseUrl = "http://localhost:$port"
         val correctRequest = HttpEntity(User(null, "Mario", "mario@gmail.com", "Pwd123456&").toDTO())
         val response = restTemplate.postForEntity<Unit>(
-            "$baseUrl/register",
+            "$baseUrl/users/register",
             correctRequest
         )
         println(response.toString())
@@ -149,6 +156,75 @@ class IntegrationTests {
 
     }
 
+    @Test
+    fun rateLimiter() {
+        val baseUrl = "http://localhost:$port"
+       /* for(i in 0..20) {
+            //val name = Name.values()[Random.nextInt(Name.values().size)].toString()
+            val name = Name.values()[i].toString()
+            val email = name.lowercase().plus("@gmail.com")
+            val userdto = User(null, name, email, "Pwd123456&").toDTO()
+            println("User: $userdto")
+            val correctRequest = HttpEntity(userdto)
+            val response = restTemplate.postForEntity<Unit>(
+                "$baseUrl/users/register",
+                correctRequest
+            )
+            println("Request $i at ${LocalDateTime.now()} with Response: ${response.statusCode}")
+        }*/
+        var cycle = true
+        var counter = 0
+        var start : LocalTime  = LocalTime.now()
+        while(cycle) {
+            if(counter == 0) start = LocalTime.now()
+            val name = Name.values()[Random.nextInt(Name.values().size)].toString()
+            val email = name.lowercase().plus("@gmail.com")
+            val userdto = User(null, name, email, "Pwd123456&").toDTO()
+            val correctRequest = HttpEntity(userdto)
+            counter++
+            val response = restTemplate.postForEntity<Unit>(
+                "$baseUrl/users/register",
+                correctRequest
+            )
+
+            if(start.until(LocalTime.now(), ChronoUnit.SECONDS) == 1L) {
+                if(counter >= 10) {
+                    Assertions.assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.statusCode)
+                    cycle = false
+                } else {
+                    counter = 0
+                    println("Counter resetted")
+                }
+            }
+        }
+    }
+
     //Todo test counter
+}
+
+enum class Name {
+    Mario,
+    Andrea,
+    Lorenzo,
+    Roberto,
+    Teodoro,
+    Anna,
+    Federico,
+    Francesco,
+    Gabriele,
+    Giovanni,
+    Gianpiero,
+    Marco,
+    Cristina,
+    Michela,
+    Giulia,
+    Valentina,
+    Matteo,
+    Simona,
+    Katia,
+    Sabrina,
+    Maria,
+    Hinata,
+    Sakura
 }
 

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*
 
 
 @RestController
+@RequestMapping("/users")
 class UserController {
 
     @Autowired
@@ -29,7 +30,7 @@ class UserController {
         us.validateUserData(user)
         val userprovdto = us.registerUser(user)
 
-        var emailServiceImpl = EmailServiceImpl()
+        //var emailServiceImpl = EmailServiceImpl()
         //emailServiceImpl.sendEmail("")
 
         return userprovdto
