@@ -8,31 +8,55 @@ import it.polito.server.controller.UserNotUnique
 import it.polito.server.controller.UserPasswordNotStrong
 import it.polito.server.entity.Activation
 import it.polito.server.entity.User
+import it.polito.server.repository.ActivationRepository
 import it.polito.server.repository.UserRepository
 import it.polito.server.service.UserServiceImpl
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.junit.jupiter.Container
+import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDateTime
 
 
-
+@Testcontainers
 @SpringBootTest
+@AutoConfigureTestDatabase(replace= AutoConfigureTestDatabase.Replace.NONE)
 class UserRegistrationTests {
+
+    companion object {
+        @Container
+        val postgres = PostgreSQLContainer("postgres:latest")
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun properties(registry: DynamicPropertyRegistry) {
+            registry.add("spring.datasource.url", postgres::getJdbcUrl)
+            registry.add("spring.datasource.username", postgres::getUsername)
+            registry.add("spring.datasource.password", postgres::getPassword)
+            registry.add("spring.jpa.hibernate.ddl-auto") { "create-drop" }
+        }
+    }
 
     @Autowired
     private lateinit var userServiceImpl: UserServiceImpl
 
     @Test
     fun testDTOs() {
-        var deadline = LocalDateTime.now()
-        var user = User(null, "Mario", "mario@gmail.com","Pwd123456&")
-        var activation = Activation(user, 12345, deadline)
-        var userDTO = user.toDTO()
-        var activationDTO = activation.toDTO()
+        val deadline = LocalDateTime.now()
+        val user = User(null, "Mario", "mario@gmail.com","Pwd123456&")
+        val activation = Activation(user, 12345, deadline)
+        val userDTO = user.toDTO()
+        val activationDTO = activation.toDTO()
 
         //userDTO Checks
         Assertions.assertEquals(userDTO.id,user.id)

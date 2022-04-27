@@ -4,6 +4,7 @@ package it.polito.server
 import it.polito.server.entity.User
 import it.polito.server.repository.ActivationRepository
 import it.polito.server.repository.UserRepository
+import it.polito.server.service.UserServiceImpl
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,7 +42,7 @@ class IntegrationTests {
     }
 
     @LocalServerPort
-    protected var port: Int = 8080
+    protected var port: Int = 0
 
     @Autowired
     lateinit var restTemplate: TestRestTemplate
@@ -54,15 +55,16 @@ class IntegrationTests {
     @Test
     fun tests() {
         val baseUrl = "http://localhost:$port"
-        var correctRequest = HttpEntity(User(null, "Mario", "mario@gmail.com", "Pwd123456&").toDTO())
-        var duplicatedNameRequest = HttpEntity(User(null, "Mario", "mario1@gmail.com", "Pwd1234567&").toDTO())
-        var duplicatedMailRequest = HttpEntity(User(null, "Mario1", "mario@gmail.com", "Pwd1234567&").toDTO())
-        var invalidMailRequest = HttpEntity(User(null, "Mario1", "mariogmail.com", "Pwd1234567&").toDTO())
-        var invalidPassowrdRequest1 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "Pw1&").toDTO())
-        var invalidPassowrdRequest2 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "P344234231&").toDTO())
-        var invalidPassowrdRequest3 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "Pwdsasdsadsa&").toDTO())
-        var invalidPassowrdRequest4 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "Pw1111111111").toDTO())
-        var invalidPassowrdRequest5 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "fdsfdsfdsw1&").toDTO())
+
+        val correctRequest = HttpEntity(User(null, "Mario", "mario@gmail.com", "Pwd123456&").toDTO())
+        val duplicatedNameRequest = HttpEntity(User(null, "Mario", "mario1@gmail.com", "Pwd1234567&").toDTO())
+        val duplicatedMailRequest = HttpEntity(User(null, "Mario1", "mario@gmail.com", "Pwd1234567&").toDTO())
+        val invalidMailRequest = HttpEntity(User(null, "Mario1", "mariogmail.com", "Pwd1234567&").toDTO())
+        val invalidPassowrdRequest1 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "Pw1&").toDTO())
+        val invalidPassowrdRequest2 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "P344234231&").toDTO())
+        val invalidPassowrdRequest3 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "Pwdsasdsadsa&").toDTO())
+        val invalidPassowrdRequest4 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "Pw1111111111").toDTO())
+        val invalidPassowrdRequest5 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "fdsfdsfdsw1&").toDTO())
 
         //Correct case
         var response = restTemplate.postForEntity<Unit>(
@@ -130,8 +132,8 @@ class IntegrationTests {
     @Test
     fun pruneExpire() {
         val baseUrl = "http://localhost:$port"
-        var correctRequest = HttpEntity(User(null, "Mario", "mario@gmail.com", "Pwd123456&").toDTO())
-        var response = restTemplate.postForEntity<Unit>(
+        val correctRequest = HttpEntity(User(null, "Mario", "mario@gmail.com", "Pwd123456&").toDTO())
+        val response = restTemplate.postForEntity<Unit>(
             "$baseUrl/register",
             correctRequest
         )
