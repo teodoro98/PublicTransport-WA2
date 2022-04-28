@@ -48,13 +48,13 @@ class UserServiceImpl: UserService {
     override fun pruneExpiredActivation() {
         val time = LocalDateTime.now()
         activationRepository.findByDeadline(time)?.forEach { it ->
-            println(it.toString() + "DELETED")
+            println("Cancellato per deadline" + it.toString() + "DELETED")
             it.user.id?.let { id -> userRepository.deleteById(id) }
             //activationRepository.deleteById(it.id!!)
         }
 
         activationRepository.findByDeadCounter()?.forEach { it ->
-            println(it.toString() + "DELETED")
+            println("Cancellato per counter" +it.toString() + "DELETED")
             it.user.id?.let { id -> userRepository.deleteById(id) }
             //activationRepository.deleteById(it.id!!)
         }

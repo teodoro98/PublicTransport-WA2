@@ -6,8 +6,8 @@ import it.polito.server.dto.ValidationDTO
 import it.polito.server.entity.User
 import it.polito.server.repository.ActivationRepository
 import it.polito.server.repository.UserRepository
-import it.polito.server.service.UserServiceImpl
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
@@ -19,12 +19,9 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import org.springframework.util.Assert
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import java.time.Duration
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -70,7 +67,7 @@ class IntegrationTests {
     }
 
     @Test
-    fun tests() {
+    fun testsConstrains() {
         val baseUrl = "http://localhost:$port"
 
         val correctRequest = HttpEntity(User(null, "Mario", "mario@gmail.com", "Pwd123456&").toDTO())
@@ -152,10 +149,7 @@ class IntegrationTests {
         val correctRequest = HttpEntity(User(null, "Mario", "mario@gmail.com", "Pwd123456&").toDTO())
         val response = restTemplate.postForEntity<Unit>(
             "$baseUrl/users/register",
-            correctRequest
-        )
-        println(response.toString())
-        println(response.statusCode)
+            correctRequest)
         Assertions.assertEquals(HttpStatus.CREATED, response.statusCode)
 
         Thread.sleep(20000)
@@ -163,6 +157,69 @@ class IntegrationTests {
         println(activationRepository.findAll())
         Assertions.assertEquals(0,userRepository.findAll().count())
         Assertions.assertEquals(0,activationRepository.findAll().count())
+
+    }
+
+    @Test
+    fun counterToZero() {
+        val baseUrl = "http://localhost:$port"
+        val correctRequest = HttpEntity(User(null, "Carletto", "carletto@gmail.com", "Pwd123456&").toDTO())
+        val response = restTemplate.postForEntity<UserProvDTO>(
+            "$baseUrl/users/register",
+            correctRequest
+        )
+        Assertions.assertEquals(HttpStatus.CREATED, response.statusCode)
+        val provisionalID = response.body?.provisional_id
+        val activationCode =123456789
+        val validationDTO = ValidationDTO(provisionalID!!, activationCode.toLong())
+        val validateRequest = HttpEntity(validationDTO)
+
+        //counter to 4
+        var validateResponse = restTemplate.postForEntity<UserProvDTO>(
+            "$baseUrl/users/validate",
+            validateRequest
+        )
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, validateResponse.statusCode)
+
+        //counter to 3
+        validateResponse = restTemplate.postForEntity<UserProvDTO>(
+            "$baseUrl/users/validate",
+            validateRequest
+        )
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, validateResponse.statusCode)
+        //counter to 2
+        validateResponse = restTemplate.postForEntity<UserProvDTO>(
+            "$baseUrl/users/validate",
+            validateRequest
+        )
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, validateResponse.statusCode)
+        //counter to 1
+        validateResponse = restTemplate.postForEntity<UserProvDTO>(
+            "$baseUrl/users/validate",
+            validateRequest
+        )
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, validateResponse.statusCode)
+
+        Assertions.assertEquals(1,userRepository.findAll().count())
+        Assertions.assertEquals(1,activationRepository.findAll().count())
+
+        //counter to 0
+        validateResponse = restTemplate.postForEntity<UserProvDTO>(
+            "$baseUrl/users/validate",
+            validateRequest
+        )
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, validateResponse.statusCode)
+
+        //Counter -1
+        validateResponse = restTemplate.postForEntity<UserProvDTO>(
+            "$baseUrl/users/validate",
+            validateRequest
+        )
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, validateResponse.statusCode)
+        Thread.sleep(5000)
+        Assertions.assertEquals(0,userRepository.findAll().count())
+        Assertions.assertEquals(0,activationRepository.findAll().count())
+
 
     }
 

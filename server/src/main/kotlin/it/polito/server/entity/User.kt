@@ -39,6 +39,7 @@ class User (
     fun toDTO(): UserDTO {
         return UserDTO(id, nickname, email, password, active)
     }
+    
 
     fun toDTOSlim(): UserSlimDTO {
         return UserSlimDTO(id, nickname, email)
