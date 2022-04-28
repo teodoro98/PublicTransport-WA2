@@ -20,7 +20,10 @@ class RateLimiterInterceptor : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         if(!bucket.tryConsume(1)) {
+            //println("Bucket empty")
             response.sendError(HttpStatus.TOO_MANY_REQUESTS.value(), "")
+        } else {
+            //println("Bucket remaining: ${bucket.availableTokens}")
         }
         return super.preHandle(request, response, handler)
     }

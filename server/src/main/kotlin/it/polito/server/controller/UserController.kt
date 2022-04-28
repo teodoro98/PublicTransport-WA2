@@ -9,6 +9,7 @@ import it.polito.server.service.UserServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 
 @RestController
@@ -32,8 +33,8 @@ class UserController {
     fun registration(@RequestBody user: UserDTO): UserProvDTO {
         us.validateUserData(user)
         val tupla = us.registerUser(user)
-
         tupla.first.provisional_id?.let { email.sendEmail(user.email, tupla.second, it) }
+        println("Email sent at ${LocalDateTime.now()}")
         return tupla.first
     }
 

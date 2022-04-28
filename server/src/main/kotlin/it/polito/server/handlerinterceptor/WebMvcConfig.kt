@@ -12,6 +12,6 @@ class WebMvcConfig : WebMvcConfigurer {
         super.addInterceptors(registry)
         val rateLimiterInterceptor = RateLimiterInterceptor()
         registry.addInterceptor(rateLimiterInterceptor)
-            .addPathPatterns("/users/register")
+            .addPathPatterns("/users/**")
     }
 }

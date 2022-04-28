@@ -28,17 +28,16 @@ class UserServiceImpl: UserService {
     @Autowired
     private lateinit var activationRepository : ActivationRepository
 
-    // Configuration data
-    private val deadline = LocalDateTime.now().plusSeconds(2)
-
 
     override fun registerUser(user: UserDTO): Pair<UserProvDTO, Long> {
         this.validateUserData(user)
+        val deadline = LocalDateTime.now().plusSeconds(20)
         try {
             val u = userRepository.save(User(null, user.nickname, user.email, user.password))
             val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
             u.activation = a
             userRepository.save(u)
+            println("User deadline at ${a.deadline}")
             return Pair(UserProvDTO(a.id, u.email), a.token)
         } catch(ex : DataIntegrityViolationException) {
             throw UserNotUnique()
@@ -72,10 +71,10 @@ class UserServiceImpl: UserService {
         val act  = activationRepository.findById(validation.provisional_id).orElseThrow {
             throw ActivationIDNotFound()
         }
-        if(LocalDateTime.now() >= act.deadline) {
+        if(LocalDateTime.now().isAfter(act.deadline)) {
             throw ActivationCodeExpired()
         }
-        if(act.counter > 0) {
+        if(act.counter == 0L) {
             throw ActivationCodeExpired()
         }
         if(act.token != validation.activation_code) {

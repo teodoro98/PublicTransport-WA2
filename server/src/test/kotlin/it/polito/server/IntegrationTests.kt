@@ -1,8 +1,8 @@
 package it.polito.server
 
 
-import it.polito.server.dto.UserDTO
-import it.polito.server.dto.UserSlimDTO
+import it.polito.server.dto.UserProvDTO
+import it.polito.server.dto.ValidationDTO
 import it.polito.server.entity.User
 import it.polito.server.repository.ActivationRepository
 import it.polito.server.repository.UserRepository
@@ -27,6 +27,8 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
+import java.util.*
+import java.util.concurrent.Delayed
 import kotlin.random.Random
 
 
@@ -58,6 +60,14 @@ class IntegrationTests {
     lateinit var userRepository: UserRepository
     @Autowired
     lateinit var activationRepository: ActivationRepository
+
+    @BeforeEach
+    fun clearDb() {
+        userRepository.deleteAll()
+        println("Deleted users")
+        activationRepository.deleteAll()
+        println("Deleted users")
+    }
 
     @Test
     fun tests() {
@@ -148,7 +158,7 @@ class IntegrationTests {
         println(response.statusCode)
         Assertions.assertEquals(HttpStatus.CREATED, response.statusCode)
 
-        Thread.sleep(10000)
+        Thread.sleep(20000)
         println(userRepository.findAll().count())
         println(activationRepository.findAll())
         Assertions.assertEquals(0,userRepository.findAll().count())
@@ -177,14 +187,22 @@ class IntegrationTests {
         var start : LocalTime  = LocalTime.now()
         while(cycle) {
             if(counter == 0) start = LocalTime.now()
-            val name = Name.values()[Random.nextInt(Name.values().size)].toString()
+            /*val name = Name.values()[Random.nextInt(Name.values().size)].toString()
             val email = name.lowercase().plus("@gmail.com")
             val userdto = User(null, name, email, "Pwd123456&").toDTO()
             val correctRequest = HttpEntity(userdto)
-            counter++
             val response = restTemplate.postForEntity<Unit>(
                 "$baseUrl/users/register",
                 correctRequest
+            )*/
+            counter++
+
+            val validationDTO = ValidationDTO(UUID.randomUUID(), 0L)
+            val validateRequest = HttpEntity(validationDTO)
+
+            val response = restTemplate.postForEntity<Unit>(
+                "$baseUrl/users/validate",
+                validateRequest
             )
 
             if(start.until(LocalTime.now(), ChronoUnit.SECONDS) == 1L) {
@@ -198,8 +216,6 @@ class IntegrationTests {
             }
         }
     }
-
-    //Todo test counter
 }
 
 enum class Name {
