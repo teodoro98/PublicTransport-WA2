@@ -18,6 +18,9 @@ class UserController {
     @Autowired
     private lateinit var us: UserServiceImpl
 
+    @Autowired
+    private lateinit var email: EmailServiceImpl
+
     @PostMapping("/validate")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun validate(@RequestBody validation : ValidationDTO): UserSlimDTO {
@@ -28,12 +31,10 @@ class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     fun registration(@RequestBody user: UserDTO): UserProvDTO {
         us.validateUserData(user)
-        val userprovdto = us.registerUser(user)
+        val tupla = us.registerUser(user)
 
-        //var emailServiceImpl = EmailServiceImpl()
-        //emailServiceImpl.sendEmail("")
-
-        return userprovdto
+        tupla.first.provisional_id?.let { email.sendEmail(user.email, tupla.second, it) }
+        return tupla.first
     }
 
 }

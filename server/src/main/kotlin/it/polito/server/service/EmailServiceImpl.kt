@@ -1,20 +1,34 @@
 package it.polito.server.service
 
-import org.springframework.mail.SimpleMailMessage
-import org.springframework.mail.javamail.JavaMailSenderImpl
+import javax.mail.MessagingException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import java.util.*
 
-
+@Service
 class EmailServiceImpl: EmailService {
 
-    private val javaMailSender = JavaMailSenderImpl()
+    @Autowired
+    private lateinit var mailSender:JavaMailSender
 
-    override fun sendEmail(email: String) {
+    override fun sendEmail(to : String, activationCode : Long, provitionalId : UUID) {
 
-        val msg = SimpleMailMessage()
-        msg.setTo("feafea@gmail.com", "andreacv1998@gmail.com")
-        msg.setSubject("Testing from Spring Boot")
-        msg.setText("Hello World \n Spring Boot Email")
+        try {
+            val mimeMessage = mailSender.createMimeMessage()
+            val helper = MimeMessageHelper(mimeMessage, false, "utf-8")
 
-        javaMailSender.send(msg)
+            val content = "<H1>Active your account!</H1> <div> Activation code:$activationCode</div><div>ProvitionalID: $provitionalId"
+
+            helper.setFrom("pushz.andrea@rob.corbo");
+            helper.setTo(to);
+            helper.setSubject("Activate your account");
+            mimeMessage.setContent(content, "text/html");
+            mailSender.send(mimeMessage);
+        } catch (e: MessagingException){
+
+    }
+
     }
 }

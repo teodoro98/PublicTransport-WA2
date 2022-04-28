@@ -32,14 +32,14 @@ class UserServiceImpl: UserService {
     private val deadline = LocalDateTime.now().plusSeconds(2)
 
 
-    override fun registerUser(user: UserDTO): UserProvDTO {
+    override fun registerUser(user: UserDTO): Pair<UserProvDTO, Long> {
         this.validateUserData(user)
         try {
             val u = userRepository.save(User(null, user.nickname, user.email, user.password))
             val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
             u.activation = a
             userRepository.save(u)
-            return UserProvDTO(a.id, u.email)
+            return Pair(UserProvDTO(a.id, u.email), a.token)
         } catch(ex : DataIntegrityViolationException) {
             throw UserNotUnique()
         }

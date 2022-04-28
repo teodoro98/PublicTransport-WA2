@@ -11,7 +11,7 @@ interface UserService {
 
     fun validateUserEmail(validation : ValidationDTO): UserSlimDTO
 
-    fun registerUser(user: UserDTO) : UserProvDTO
+    fun registerUser(user: UserDTO) : Pair<UserProvDTO, Long>
 
     fun pruneExpiredActivation()
 
