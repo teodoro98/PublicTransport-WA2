@@ -17,6 +17,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import java.security.SecureRandom
 
 
 @Service
@@ -33,11 +35,12 @@ class UserServiceImpl: UserService {
         this.validateUserData(user)
         val deadline = LocalDateTime.now().plusSeconds(20)
         try {
-            val u = userRepository.save(User(null, user.nickname, user.email, user.password))
+            val salt = SecureRandom.getInstanceStrong()
+            val encoder = BCryptPasswordEncoder(20, salt )
+            val u = userRepository.save(User(null, user.nickname, user.email, encoder.encode(user.password)))
             val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
             u.activation = a
             userRepository.save(u)
-            println("User deadline at ${a.deadline}")
             return Pair(UserProvDTO(a.id, u.email), a.token)
         } catch(ex : DataIntegrityViolationException) {
             throw UserNotUnique()

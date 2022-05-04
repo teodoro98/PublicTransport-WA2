@@ -2,6 +2,7 @@ package it.polito.server.entity
 
 import it.polito.server.dto.UserDTO
 import it.polito.server.dto.UserSlimDTO
+import it.polito.server.dto.UserLoginDTO
 import javax.persistence.*
 
 
@@ -24,6 +25,9 @@ class User (
    ) {
 
     @Column(updatable = true, nullable = false, )
+    var role : Role = Role.COSTUMER
+
+    @Column(updatable = true, nullable = false, )
     var active : Boolean = false
 
     @Id
@@ -37,12 +41,16 @@ class User (
     var id : Long? = null
 
     fun toDTO(): UserDTO {
-        return UserDTO(id, nickname, email, password, active)
+        return UserDTO(id, nickname, email, password, active, role)
     }
     
 
     fun toDTOSlim(): UserSlimDTO {
         return UserSlimDTO(id, nickname, email)
+    }
+
+    fun toDTOLogin(): UserLoginDTO{
+        return UserLoginDTO(nickname, password)
     }
 }
 

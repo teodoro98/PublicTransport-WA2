@@ -85,6 +85,7 @@ class IntegrationTests {
             "$baseUrl/users/register",
             correctRequest
         )
+
         assert(response.statusCode == HttpStatus.CREATED)
         println(response.body)
 
