@@ -6,6 +6,7 @@ import it.polito.server.controller.EmailNotValid
 import it.polito.server.controller.UserEmpty
 import it.polito.server.controller.UserNotUnique
 import it.polito.server.controller.UserPasswordNotStrong
+import it.polito.server.dto.UserDTO
 import it.polito.server.entity.Activation
 import it.polito.server.entity.User
 import it.polito.server.repository.ActivationRepository
@@ -53,7 +54,7 @@ class UserRegistrationTests {
     @Test
     fun testDTOs() {
         val deadline = LocalDateTime.now()
-        val user = User(null, "Mario", "mario@gmail.com","Pwd123456&")
+        val user = User(null, "Mario", "mario@gmail.com","Pwd123456&", User.Role.CUSTOMER)
         val activation = Activation(user, 12345, deadline)
         val userDTO = user.toDTO()
         val activationDTO = activation.toDTO()
@@ -77,17 +78,17 @@ class UserRegistrationTests {
     @Test
     fun constrainsDB() {
 
-        val correctUser      =  User(null, "Mario", "mario@gmail.com","Pwd123456&").toDTO()
-        val sameNameUser     =  User(null, "Mario", "mario@gmail.com","Pwd123456&").toDTO()
-        val emptyNameUser    =  User(null, "", "mario@gmail.com","Pwd123456&").toDTO()
-        val sameEmailUser    =  User(null, "Carlo", "mario@gmail.com","Pwd123456&").toDTO()
-        val emptyEmailUser   =  User(null, "Mario", "","Pwd123456&").toDTO()
-        val invalidEmailUser =  User(null, "Mario", "mariogmail.com","Pwd123456&").toDTO()
-        val invalidPassword1 =  User(null, "Carlo", "carlo@gmail.com","P1wd&").toDTO()
-        val invalidPassword2 =  User(null, "Carlo", "carlo@gmail.com","PWD123456&").toDTO()
-        val invalidPassword3 =  User(null, "Carlo", "carlo@gmail.com","Pwddsadsadsad&").toDTO()
-        val invalidPassword4 =  User(null, "Carlo", "carlo@gmail.com","Ppwd123456").toDTO()
-        val invalidPassword5 =  User(null, "Carlo", "carlo@gmail.com","ppwd123456&").toDTO()
+        val correctUser      =  UserDTO(null, "Mario", "mario@gmail.com","Pwd123456&", false)
+        val sameNameUser     =  UserDTO(null, "Mario", "mario@gmail.com","Pwd123456&", false)
+        val emptyNameUser    =  UserDTO(null, "", "mario@gmail.com","Pwd123456&", false)
+        val sameEmailUser    =  UserDTO(null, "Carlo", "mario@gmail.com","Pwd123456&", false)
+        val emptyEmailUser   =  UserDTO(null, "Mario", "","Pwd123456&", false)
+        val invalidEmailUser =  UserDTO(null, "Mario", "mariogmail.com","Pwd123456&", false)
+        val invalidPassword1 =  UserDTO(null, "Carlo", "carlo@gmail.com","P1wd&", false)
+        val invalidPassword2 =  UserDTO(null, "Carlo", "carlo@gmail.com","PWD123456&", false)
+        val invalidPassword3 =  UserDTO(null, "Carlo", "carlo@gmail.com","Pwddsadsadsad&", false)
+        val invalidPassword4 =  UserDTO(null, "Carlo", "carlo@gmail.com","Ppwd123456", false)
+        val invalidPassword5 =  UserDTO(null, "Carlo", "carlo@gmail.com","ppwd123456&", false)
 
         //Test correctCase
         Assertions.assertDoesNotThrow {userServiceImpl.registerUser(correctUser)}

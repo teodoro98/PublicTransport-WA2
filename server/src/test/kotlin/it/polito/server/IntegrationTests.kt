@@ -1,6 +1,7 @@
 package it.polito.server
 
 
+import it.polito.server.dto.UserDTO
 import it.polito.server.dto.UserProvDTO
 import it.polito.server.dto.ValidationDTO
 import it.polito.server.entity.User
@@ -70,15 +71,15 @@ class IntegrationTests {
     fun testsConstrains() {
         val baseUrl = "http://localhost:$port"
 
-        val correctRequest = HttpEntity(User(null, "Mario", "mario@gmail.com", "Pwd123456&").toDTO())
-        val duplicatedNameRequest = HttpEntity(User(null, "Mario", "mario1@gmail.com", "Pwd1234567&").toDTO())
-        val duplicatedMailRequest = HttpEntity(User(null, "Mario1", "mario@gmail.com", "Pwd1234567&").toDTO())
-        val invalidMailRequest = HttpEntity(User(null, "Mario1", "mariogmail.com", "Pwd1234567&").toDTO())
-        val invalidPassowrdRequest1 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "Pw1&").toDTO())
-        val invalidPassowrdRequest2 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "P344234231&").toDTO())
-        val invalidPassowrdRequest3 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "Pwdsasdsadsa&").toDTO())
-        val invalidPassowrdRequest4 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "Pw1111111111").toDTO())
-        val invalidPassowrdRequest5 = HttpEntity(User(null, "Carlo", "carlo@gmail.com", "fdsfdsfdsw1&").toDTO())
+        val correctRequest = HttpEntity(UserDTO(null, "Mario", "mario@gmail.com", "Pwd123456&", false))
+        val duplicatedNameRequest = HttpEntity(UserDTO(null, "Mario", "mario1@gmail.com", "Pwd1234567&", false))
+        val duplicatedMailRequest = HttpEntity(UserDTO(null, "Mario1", "mario@gmail.com", "Pwd1234567&", false))
+        val invalidMailRequest = HttpEntity(UserDTO(null, "Mario1", "mariogmail.com", "Pwd1234567&", false))
+        val invalidPassowrdRequest1 = HttpEntity(UserDTO(null, "Carlo", "carlo@gmail.com", "Pw1&", false))
+        val invalidPassowrdRequest2 = HttpEntity(UserDTO(null, "Carlo", "carlo@gmail.com", "P344234231&", false))
+        val invalidPassowrdRequest3 = HttpEntity(UserDTO(null, "Carlo", "carlo@gmail.com", "Pwdsasdsadsa&", false))
+        val invalidPassowrdRequest4 = HttpEntity(UserDTO(null, "Carlo", "carlo@gmail.com", "Pw1111111111", false))
+        val invalidPassowrdRequest5 = HttpEntity(UserDTO(null, "Carlo", "carlo@gmail.com", "fdsfdsfdsw1&", false))
 
         //Correct case
         var response = restTemplate.postForEntity<Unit>(
@@ -146,7 +147,7 @@ class IntegrationTests {
     @Test
     fun pruneExpire() {
         val baseUrl = "http://localhost:$port"
-        val correctRequest = HttpEntity(User(null, "Mario", "mario@gmail.com", "Pwd123456&").toDTO())
+        val correctRequest = HttpEntity(UserDTO(null, "Mario", "mario@gmail.com", "Pwd123456&", false))
         val response = restTemplate.postForEntity<Unit>(
             "$baseUrl/users/register",
             correctRequest)
@@ -163,7 +164,7 @@ class IntegrationTests {
     @Test
     fun counterToZero() {
         val baseUrl = "http://localhost:$port"
-        val correctRequest = HttpEntity(User(null, "Carletto", "carletto@gmail.com", "Pwd123456&").toDTO())
+        val correctRequest = HttpEntity(UserDTO(null, "Carletto", "carletto@gmail.com", "Pwd123456&", false))
         val response = restTemplate.postForEntity<UserProvDTO>(
             "$baseUrl/users/register",
             correctRequest

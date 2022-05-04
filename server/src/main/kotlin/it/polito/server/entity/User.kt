@@ -2,6 +2,7 @@ package it.polito.server.entity
 
 import it.polito.server.dto.UserDTO
 import it.polito.server.dto.UserSlimDTO
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import javax.persistence.*
 
 
@@ -19,7 +20,10 @@ class User (
     var email: String,
 
     @Column(updatable = true, nullable = false, )
-    var password: String
+    var password: String,
+
+    @Column(updatable = true, nullable = false)
+    var role : Role
 
    ) {
 
@@ -36,6 +40,10 @@ class User (
     @Column(updatable = false, nullable = false)
     var id : Long? = null
 
+    init {
+        password = BCryptPasswordEncoder().encode(password)
+    }
+
     fun toDTO(): UserDTO {
         return UserDTO(id, nickname, email, password, active)
     }
@@ -43,6 +51,11 @@ class User (
 
     fun toDTOSlim(): UserSlimDTO {
         return UserSlimDTO(id, nickname, email)
+    }
+
+    enum class Role {
+        CUSTOMER,
+        ADMIN
     }
 }
 

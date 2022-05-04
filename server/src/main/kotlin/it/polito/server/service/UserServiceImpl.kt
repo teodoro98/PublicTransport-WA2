@@ -33,7 +33,7 @@ class UserServiceImpl: UserService {
         this.validateUserData(user)
         val deadline = LocalDateTime.now().plusSeconds(20)
         try {
-            val u = userRepository.save(User(null, user.nickname, user.email, user.password))
+            val u = userRepository.save(User(null, user.nickname, user.email, user.password, User.Role.CUSTOMER))
             val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
             u.activation = a
             userRepository.save(u)
