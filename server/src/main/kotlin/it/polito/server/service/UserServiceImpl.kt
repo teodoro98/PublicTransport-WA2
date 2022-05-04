@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import java.security.SecureRandom
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalUnit
@@ -37,13 +38,17 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
 
     private val encodedSecret: String = Base64.getEncoder().encodeToString(clearSecret.toByteArray())
     private val algorithm: SignatureAlgorithm = SignatureAlgorithm.HS256
+    private val version: BCryptPasswordEncoder.BCryptVersion = BCryptPasswordEncoder.BCryptVersion.`$2A`
+    private val strenght: Int = 20
 
 
     override fun registerUser(user: UserDTO): Pair<UserProvDTO, Long> {
         this.validateUserData(user)
         val deadline = LocalDateTime.now().plusSeconds(20)
         try {
-            val u = userRepository.save(User(null, user.nickname, user.email, user.password, User.Role.CUSTOMER))
+            val salt = SecureRandom.getInstanceStrong()
+            val encoder = BCryptPasswordEncoder(version, strenght, salt)
+            val u = userRepository.save(User(null, user.nickname, user.email, encoder.encode(user.password), User.Role.COSTUMER, salt))
             val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
             u.activation = a
             userRepository.save(u)

@@ -21,11 +21,13 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.security.SecureRandom
 import java.time.LocalDateTime
 
 
@@ -54,7 +56,9 @@ class UserRegistrationTests {
     @Test
     fun testDTOs() {
         val deadline = LocalDateTime.now()
-        val user = User(null, "Mario", "mario@gmail.com","Pwd123456&", User.Role.CUSTOMER)
+        val salt = SecureRandom.getInstanceStrong()
+        val encoder = BCryptPasswordEncoder(20, salt)
+        val user = User(null, "Mario", "mario@gmail.com",encoder.encode("Pwd123456&"), User.Role.COSTUMER, salt)
         val activation = Activation(user, 12345, deadline)
         val userDTO = user.toDTO()
         val activationDTO = activation.toDTO()
