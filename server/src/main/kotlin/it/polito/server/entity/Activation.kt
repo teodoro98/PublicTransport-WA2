@@ -23,7 +23,7 @@ class Activation(
     @Column(updatable = false, nullable = false)
     var token : Long,
     @Column(updatable = false, nullable = false)
-    var deadline : LocalDateTime,
+    var deadline : LocalDateTime
 
     ) {
 
@@ -40,6 +40,7 @@ class Activation(
     fun toDTO(): ActivationDTO {
         return ActivationDTO(id, counter, user, token, deadline)
     }
+
 }
 
 

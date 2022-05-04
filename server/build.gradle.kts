@@ -31,6 +31,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.6.7")
     testImplementation ("org.testcontainers:junit-jupiter:1.17.1")
     testImplementation("org.testcontainers:postgresql:1.17.1")
+    // https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
+    implementation("org.springframework.security:spring-security-crypto:5.6.3")
+
 }
 
 dependencyManagement {
