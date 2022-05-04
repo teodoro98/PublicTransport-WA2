@@ -263,7 +263,7 @@ class IntegrationTests {
                 validateRequest
             )
 
-            if(start.until(LocalTime.now(), ChronoUnit.MILLIS) == 950L) {
+            if(start.until(LocalTime.now(), ChronoUnit.SECONDS) >= 1L) {
                 if(counter > 10) {
                     Assertions.assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.statusCode)
                     cycle = false
