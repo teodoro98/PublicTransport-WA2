@@ -1,9 +1,6 @@
 package it.polito.server.service
 
-import it.polito.server.dto.UserDTO
-import it.polito.server.dto.UserProvDTO
-import it.polito.server.dto.UserSlimDTO
-import it.polito.server.dto.ValidationDTO
+import it.polito.server.dto.*
 
 interface UserService {
 
@@ -14,5 +11,7 @@ interface UserService {
     fun registerUser(user: UserDTO) : Pair<UserProvDTO, Long>
 
     fun pruneExpiredActivation()
+
+    fun loginUser(user: UserLoginDTO) : String
 
 }

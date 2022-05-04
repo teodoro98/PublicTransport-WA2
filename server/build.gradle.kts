@@ -32,6 +32,8 @@ dependencies {
     testImplementation("org.testcontainers:postgresql:1.17.1")
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
     implementation("org.springframework.security:spring-security-crypto:5.6.3")
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
+    implementation("io.jsonwebtoken:jjwt:0.9.1")
 
 }
 

@@ -1,5 +1,7 @@
 package it.polito.server.service
 
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.stereotype.Service
 import org.apache.commons.validator.EmailValidator
 import java.util.regex.*
@@ -9,24 +11,32 @@ import it.polito.server.entity.Activation
 import it.polito.server.repository.*
 import it.polito.server.entity.User
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.DataIntegrityViolationException
 import java.time.LocalDateTime
-import java.util.Random
 import kotlin.math.abs
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import java.time.temporal.TemporalUnit
+import java.util.*
 
 
 @Service
-class UserServiceImpl: UserService {
+class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: String): UserService {
 
     // Repositories
     @Autowired
     private lateinit var userRepository :  UserRepository
     @Autowired
     private lateinit var activationRepository : ActivationRepository
+
+    private val encodedSecret: String = Base64.getEncoder().encodeToString(clearSecret.toByteArray())
+    private val algorithm: SignatureAlgorithm = SignatureAlgorithm.HS256
 
 
     override fun registerUser(user: UserDTO): Pair<UserProvDTO, Long> {
@@ -92,6 +102,40 @@ class UserServiceImpl: UserService {
         val p = Pattern.compile(regex)
         val m = p.matcher(password)
         return m.matches()
+    }
+
+    override fun loginUser(user: UserLoginDTO): String {
+
+        val u : User? = userRepository.findByUsername(user.username)
+
+        if (u != null) {
+            if(BCryptPasswordEncoder().matches(user.password, u.password)) {
+                return createJwt(user.username, u.role)
+            } else {
+                //TODO("Wrong password exception and handler")
+                throw Exception()
+            }
+        } else {
+            //TODO("Not found user exception and handler")
+            throw Exception()
+        }
+    }
+
+    private fun createJwt(username: String, role: User.Role) : String {
+        val builder = Jwts.builder().signWith(algorithm, encodedSecret)
+        val iat = java.sql.Date.valueOf(LocalDate.now())
+        val exp = java.sql.Date.valueOf(
+            iat.toLocalDate().plus(
+                1L,
+                ChronoUnit.HOURS
+            )
+        )
+        return builder
+            .setSubject(username)
+            .setIssuedAt(iat)
+            .setExpiration(exp)
+            .claim("role", role)
+            .compact()
     }
 
 
