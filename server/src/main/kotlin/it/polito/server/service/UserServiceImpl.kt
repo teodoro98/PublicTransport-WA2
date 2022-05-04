@@ -47,7 +47,6 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
             val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
             u.activation = a
             userRepository.save(u)
-            println("User deadline at ${a.deadline}")
             return Pair(UserProvDTO(a.id, u.email), a.token)
         } catch(ex : DataIntegrityViolationException) {
             throw UserNotUnique()

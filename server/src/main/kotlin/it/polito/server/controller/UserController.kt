@@ -1,15 +1,14 @@
 package it.polito.server.controller
 
-import it.polito.server.dto.UserDTO
-import it.polito.server.dto.UserProvDTO
-import it.polito.server.dto.UserSlimDTO
-import it.polito.server.dto.ValidationDTO
+import it.polito.server.dto.*
 import it.polito.server.service.EmailServiceImpl
 import it.polito.server.service.UserServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
+
 
 
 @RestController
@@ -37,5 +36,15 @@ class UserController {
         println("Email sent at ${LocalDateTime.now()}")
         return tupla.first
     }
-
+/*
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun login(@RequestBody user: UserLoginDTO): Jwt {
+        us.validateUserData(user)
+        val tupla = us.registerUser(user)
+        tupla.first.provisional_id?.let { email.sendEmail(user.email, tupla.second, it) }
+        println("Email sent at ${LocalDateTime.now()}")
+        return tupla.first
+    }
+*/
 }
