@@ -263,14 +263,16 @@ class IntegrationTests {
                 validateRequest
             )
 
-            if(start.until(LocalTime.now(), ChronoUnit.SECONDS) == 1L) {
-                if(counter >= 10) {
+            if(start.until(LocalTime.now(), ChronoUnit.MILLIS) == 950L) {
+                if(counter > 10) {
                     Assertions.assertEquals(HttpStatus.TOO_MANY_REQUESTS, response.statusCode)
                     cycle = false
                 } else {
                     counter = 0
                     println("Counter resetted")
                 }
+            } else {
+                println("Time elapsed only: ${start.until(LocalTime.now(), ChronoUnit.MILLIS)}")
             }
         }
     }
