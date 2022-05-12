@@ -39,16 +39,16 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
     private val encodedSecret: String = Base64.getEncoder().encodeToString(clearSecret.toByteArray())
     private val algorithm: SignatureAlgorithm = SignatureAlgorithm.HS256
     private val version: BCryptPasswordEncoder.BCryptVersion = BCryptPasswordEncoder.BCryptVersion.`$2A`
-    private val strenght: Int = 20
+    private val strenght: Int = 12
 
 
     override fun registerUser(user: UserDTO): Pair<UserProvDTO, Long> {
         this.validateUserData(user)
         val deadline = LocalDateTime.now().plusSeconds(20)
         try {
-            val salt = SecureRandom.getInstanceStrong()
-            val encoder = BCryptPasswordEncoder(version, strenght, salt)
-            val u = userRepository.save(User(null, user.nickname, user.email, encoder.encode(user.password), User.Role.COSTUMER, salt))
+            val encoder = BCryptPasswordEncoder(version, strenght)
+            val pwd = encoder.encode(user.password)
+            val u = userRepository.save(User(null, user.nickname, user.email, pwd, User.Role.COSTUMER))
             val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
             u.activation = a
             userRepository.save(u)

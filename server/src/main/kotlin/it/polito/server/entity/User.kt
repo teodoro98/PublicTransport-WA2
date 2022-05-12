@@ -26,9 +26,6 @@ class User (
     @Column(updatable = true, nullable = false, )
     var role : Role,
 
-    @Column(updatable = true, nullable = false, )
-    var salt : java.security.SecureRandom
-
    ) {
 
     @Column(updatable = true, nullable = false, )

@@ -87,7 +87,7 @@ class IntegrationTests {
             correctRequest
         )
 
-        assert(response.statusCode == HttpStatus.CREATED)
+        Assertions.assertEquals(response.statusCode , HttpStatus.CREATED)
         println(response.body)
 
         //Duplicated name
@@ -95,21 +95,21 @@ class IntegrationTests {
             "$baseUrl/users/register",
             duplicatedNameRequest
         )
-        assert(response.statusCode == HttpStatus.BAD_REQUEST)
+        Assertions.assertEquals(response.statusCode , HttpStatus.BAD_REQUEST)
 
         //Duplicated mail
         response = restTemplate.postForEntity<Unit>(
             "$baseUrl/users/register",
             duplicatedMailRequest
         )
-        assert(response.statusCode == HttpStatus.BAD_REQUEST)
+        Assertions.assertEquals(response.statusCode , HttpStatus.BAD_REQUEST)
 
         //Invalid mail
         response = restTemplate.postForEntity<Unit>(
             "$baseUrl/users/register",
             invalidMailRequest
         )
-        assert(response.statusCode == HttpStatus.BAD_REQUEST)
+        Assertions.assertEquals(response.statusCode , HttpStatus.BAD_REQUEST)
 
         //Check password
         //Short pwd
@@ -117,31 +117,31 @@ class IntegrationTests {
             "$baseUrl/users/register",
             invalidPassowrdRequest1
         )
-        assert(response.statusCode == HttpStatus.BAD_REQUEST)
+        Assertions.assertEquals(response.statusCode , HttpStatus.BAD_REQUEST)
         //No lower case
         response = restTemplate.postForEntity<Unit>(
             "$baseUrl/users/register",
             invalidPassowrdRequest2
         )
-        assert(response.statusCode == HttpStatus.BAD_REQUEST)
+        Assertions.assertEquals(response.statusCode , HttpStatus.BAD_REQUEST)
         //No digit
         response = restTemplate.postForEntity<Unit>(
             "$baseUrl/users/register",
             invalidPassowrdRequest3
         )
-        assert(response.statusCode == HttpStatus.BAD_REQUEST)
+        Assertions.assertEquals(response.statusCode , HttpStatus.BAD_REQUEST)
         //No special
         response = restTemplate.postForEntity<Unit>(
             "$baseUrl/users/register",
             invalidPassowrdRequest4
         )
-        assert(response.statusCode == HttpStatus.BAD_REQUEST)
+        Assertions.assertEquals(response.statusCode , HttpStatus.BAD_REQUEST)
         //No upper case
         response = restTemplate.postForEntity<Unit>(
             "$baseUrl/users/register",
             invalidPassowrdRequest5
         )
-        assert(response.statusCode == HttpStatus.BAD_REQUEST)
+        Assertions.assertEquals(response.statusCode , HttpStatus.BAD_REQUEST)
 
     }
 
@@ -154,9 +154,7 @@ class IntegrationTests {
             correctRequest)
         Assertions.assertEquals(HttpStatus.CREATED, response.statusCode)
 
-        Thread.sleep(20000)
-        println(userRepository.findAll().count())
-        println(activationRepository.findAll())
+        Thread.sleep(22000)
         Assertions.assertEquals(0,userRepository.findAll().count())
         Assertions.assertEquals(0,activationRepository.findAll().count())
 

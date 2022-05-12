@@ -58,7 +58,7 @@ class UserRegistrationTests {
         val deadline = LocalDateTime.now()
         val salt = SecureRandom.getInstanceStrong()
         val encoder = BCryptPasswordEncoder(20, salt)
-        val user = User(null, "Mario", "mario@gmail.com",encoder.encode("Pwd123456&"), User.Role.COSTUMER, salt)
+        val user = User(null, "Mario", "mario@gmail.com",encoder.encode("Pwd123456&"), User.Role.COSTUMER)
         val activation = Activation(user, 12345, deadline)
         val userDTO = user.toDTO()
         val activationDTO = activation.toDTO()
