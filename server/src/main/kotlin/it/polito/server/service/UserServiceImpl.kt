@@ -116,14 +116,13 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
         if (u != null) {
             val encoder = BCryptPasswordEncoder(version, strenght)
             if(encoder.matches(user.password, u.password)) {
-                return createJwt(user.username, u.role)
+                val jwt = createJwt(user.username, u.role)
+                return jwt
             } else {
-                //TODO("Wrong password exception and handler")
-                throw Exception()
+                throw LoginWrongPassword()
             }
         } else {
-            //TODO("Not found user exception and handler")
-            throw Exception()
+            throw LoginUserNotFound()
         }
     }
 
@@ -133,10 +132,10 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
         val exp = java.sql.Date.valueOf(
             iat.toLocalDate().plus(
                 1L,
-                ChronoUnit.HOURS
+                ChronoUnit.DAYS
             )
         )
-        return builder
+        val jwt = builder
             .setSubject(username)
             .setIssuedAt(iat)
             .setExpiration(exp)
