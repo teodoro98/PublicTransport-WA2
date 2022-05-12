@@ -58,6 +58,18 @@ class ExceptionHandlerController: ResponseEntityExceptionHandler () {
         println("activation code expired")
     }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(LoginWrongPassword::class)
+    fun handleActivationCodeExpired(ex: LoginWrongPassword,  req: WebRequest?){
+        println("Login: user password mismatch")
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(LoginUserNotFound::class)
+    fun handleActivationCodeExpired(ex: LoginUserNotFound,  req: WebRequest?){
+        println("Login: user does not exists")
+    }
+
 }
 
 class UserEmpty() : Exception()
@@ -67,6 +79,8 @@ class EmailNotValid() : Exception()
 class ActivationIDNotFound() : Exception()
 class ActivationCodeMismatch() : Exception()
 class ActivationCodeExpired() : Exception()
+class LoginWrongPassword() : Exception()
+class LoginUserNotFound() : Exception()
 
 
 
