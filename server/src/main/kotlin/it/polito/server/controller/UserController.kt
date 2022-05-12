@@ -36,15 +36,12 @@ class UserController {
         println("Email sent at ${LocalDateTime.now()}")
         return tupla.first
     }
-/*
+
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun login(@RequestBody user: UserLoginDTO): Jwt {
-        us.validateUserData(user)
-        val tupla = us.registerUser(user)
-        tupla.first.provisional_id?.let { email.sendEmail(user.email, tupla.second, it) }
-        println("Email sent at ${LocalDateTime.now()}")
-        return tupla.first
+    fun login(@RequestBody user: UserLoginDTO): String {
+        val jwt = us.loginUser(user)
+        return jwt
     }
-*/
+
 }

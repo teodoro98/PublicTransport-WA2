@@ -8,4 +8,7 @@ import org.springframework.data.repository.query.Param
 interface UserRepository: CrudRepository<User, Long> {
     @Query("from User u where u.nickname<=:username")
     fun findByUsername(@Param("username")username : String): User?
+
+    @Query("update User u set u.active=true where u.nickname<=:username")
+    fun activateUser(@Param("username")username : String)
 }

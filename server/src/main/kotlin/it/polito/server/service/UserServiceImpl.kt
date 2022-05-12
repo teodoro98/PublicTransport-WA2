@@ -16,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import java.time.LocalDateTime
 import kotlin.math.abs
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
@@ -141,6 +142,9 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
             .setExpiration(exp)
             .claim("role", role)
             .compact()
+
+        return jwt
+
     }
 
 

@@ -2,6 +2,7 @@ package it.polito.server
 
 
 import it.polito.server.dto.UserDTO
+import it.polito.server.dto.UserLoginDTO
 import it.polito.server.dto.UserProvDTO
 import it.polito.server.dto.ValidationDTO
 import it.polito.server.entity.User
@@ -157,6 +158,28 @@ class IntegrationTests {
         Thread.sleep(22000)
         Assertions.assertEquals(0,userRepository.findAll().count())
         Assertions.assertEquals(0,activationRepository.findAll().count())
+
+    }
+
+    @Test
+    fun loginTest() {
+        val baseUrl = "http://localhost:$port"
+        val correctRequest = HttpEntity(UserDTO(null, "Mario", "mario@gmail.com", "Pwd123456&", false))
+        val response = restTemplate.postForEntity<Unit>(
+            "$baseUrl/users/register",
+            correctRequest)
+        Assertions.assertEquals(HttpStatus.CREATED, response.statusCode)
+        var u: User? = userRepository.findByUsername("Mario")
+        if ((u != null)) {
+            u!!.active = true;
+            userRepository.save(u!!)
+        }
+        val userLoginDTO = UserLoginDTO("Mario", "Pwd123456&")
+        val loginResponse = restTemplate.postForEntity<Unit>(
+            "$baseUrl/users/login",
+            userLoginDTO)
+        Assertions.assertEquals(HttpStatus.ACCEPTED, loginResponse.statusCode)
+        println("JWT response: ${loginResponse.body}")
 
     }
 
