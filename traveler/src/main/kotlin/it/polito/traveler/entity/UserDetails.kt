@@ -37,4 +37,8 @@ class UserDetails (
     fun toDTOUserDetails(): UserDetailsDTO{
         return UserDetailsDTO(id,name,address,dateOfBirth, telephoneNumber)
     }
+
+    enum class Role {
+        COSTUMER, ADMIN
+    }
 }
