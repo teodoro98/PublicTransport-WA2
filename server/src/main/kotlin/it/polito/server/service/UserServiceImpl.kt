@@ -113,7 +113,8 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
         val u : User? = userRepository.findByUsername(user.username)
 
         if (u != null) {
-            if(BCryptPasswordEncoder().matches(user.password, u.password)) {
+            val encoder = BCryptPasswordEncoder(version, strenght)
+            if(encoder.matches(user.password, u.password)) {
                 return createJwt(user.username, u.role)
             } else {
                 //TODO("Wrong password exception and handler")
