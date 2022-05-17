@@ -2,30 +2,32 @@ package it.polito.server.service
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
-import org.springframework.stereotype.Service
-import org.apache.commons.validator.EmailValidator
-import java.util.regex.*
 import it.polito.server.controller.*
 import it.polito.server.dto.*
 import it.polito.server.entity.Activation
-import it.polito.server.repository.*
 import it.polito.server.entity.User
+import it.polito.server.repository.*
+import org.apache.commons.validator.EmailValidator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.dao.DataIntegrityViolationException
-import java.time.LocalDateTime
-import kotlin.math.abs
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties
 import org.springframework.context.annotation.Configuration
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import java.security.SecureRandom
+import org.springframework.stereotype.Service
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
 import java.util.*
+import java.util.regex.*
+import java.util.stream.Collectors
+import kotlin.math.abs
 
 
 @Service
@@ -36,6 +38,8 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
     private lateinit var userRepository :  UserRepository
     @Autowired
     private lateinit var activationRepository : ActivationRepository
+    @Autowired
+    private lateinit var authenticationManager: AuthenticationManager
 
     private val encodedSecret: String = Base64.getEncoder().encodeToString(clearSecret.toByteArray())
     private val algorithm: SignatureAlgorithm = SignatureAlgorithm.HS256
@@ -124,6 +128,28 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
         } else {
             throw LoginUserNotFound()
         }
+    }
+
+    fun loginUser2(user: UserLoginDTO): String {
+        val authentication: Authentication = authenticationManager.authenticate(
+            UsernamePasswordAuthenticationToken(user.username, user.password)
+        )
+        SecurityContextHolder.getContext().setAuthentication(authentication)
+        val jwt: String = jwtUtils.generateJwtToken(authentication)
+
+        val userDetails: UserDetailsImpl = authentication.getPrincipal() as UserDetailsImpl
+        val roles: List<String> = userDetails.getAuthorities().stream()
+            .map { item -> item.getAuthority() }
+            .collect(Collectors.toList())
+        return ResponseEntity.ok(
+            JwtResponse(
+                jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles
+            )
+        )
     }
 
     private fun createJwt(username: String, role: User.Role) : String {
