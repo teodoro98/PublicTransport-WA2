@@ -1,6 +1,8 @@
 package it.polito.traveler.service
 
+import it.polito.traveler.dto.TicketPurchasedDTO
 import it.polito.traveler.dto.UserDetailsDTO
+import it.polito.traveler.entity.TicketPurchased
 
 interface TravelerService {
 
@@ -8,11 +10,11 @@ interface TravelerService {
 
     fun updateProfile(userDetailsDTO: UserDetailsDTO)
 
-    fun getTickets()
+    fun getTickets(id : Long) : List<TicketPurchasedDTO>
 
-    fun buyTickets()
+    fun buyTickets(id: Long, quantity: Int, zones: String)
 
-    fun getTravelers()
+    fun getTravelers() : List<UserDetailsDTO>
 
     fun findTraveler()
 

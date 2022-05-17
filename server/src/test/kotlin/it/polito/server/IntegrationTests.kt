@@ -89,7 +89,6 @@ class IntegrationTests {
         )
 
         Assertions.assertEquals(response.statusCode , HttpStatus.CREATED)
-        println(response.body)
 
         //Duplicated name
         response = restTemplate.postForEntity<Unit>(

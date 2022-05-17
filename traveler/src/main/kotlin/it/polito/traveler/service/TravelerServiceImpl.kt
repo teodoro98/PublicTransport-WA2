@@ -1,6 +1,9 @@
 package it.polito.traveler.service
 
+import it.polito.server.controller.UserEmpty
+import it.polito.traveler.dto.TicketPurchasedDTO
 import it.polito.traveler.dto.UserDetailsDTO
+import it.polito.traveler.entity.TicketPurchased
 import it.polito.traveler.entity.UserDetails
 import it.polito.traveler.repository.UserDetailsRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,29 +27,27 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}")clearSecret: S
     }
 
     override fun updateProfile(userDetailsDTO: UserDetailsDTO) {
-    //TODO
-
-    // userDetailsRepository.save(userDetailsDTO)
+        var user: UserDetails
+        try {
+            user = userDetailsRepository.findById(userDetailsDTO.id!!).get()
+        }catch (e : Exception){
+            throw UserEmpty()
+        }
+        user.address= userDetailsDTO.address
+        user.name= userDetailsDTO.name
+        user.telephoneNumber= userDetailsDTO.telephoneNumber
+        user.dateOfBirth = userDetailsDTO.dateOfBirth
+        userDetailsRepository.save(user)
     
     }
 
-/*
-        val id = userDetailsDTO.id
-        if (userDetailsRepository.existsById(id!!)){
-            val originalUser = userDetailsRepository.findById(id).get()
-            val updatedUser = UserDetails(
-                id = originalUser.id,
-                name = if (userDetailsDTO.name != "") userDetailsDTO.name else originalUser.name,
-                address = if (userDetailsDTO.address != "") userDetailsDTO.address else originalUser.address,
-                dateOfBirth = if (userDetailsDTO.dateOfBirth != "") userDetailsDTO.dateOfBirth else originalUser.dateOfBirth,
-                telephoneNumber = if (userDetailsDTO.telephoneNumber != "") userDetailsDTO.telephoneNumber else originalUser.telephoneNumber
-            )
+    override fun getTickets(id: Long) : List<TicketPurchasedDTO> {
+        val listTickets = mutableListOf<TicketPurchasedDTO>()
+        val tickets = userDetailsRepository.findTicketsById(id)
+        for (t in tickets!!){
+            listTickets.add(t)
         }
-         */
-
-
-    override fun getTickets() {
-        TODO("Not yet implemented")
+        return listTickets
     }
 
     override fun buyTickets(id: Long, quantity: Int, zones: String) {
