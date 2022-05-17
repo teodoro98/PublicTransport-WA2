@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -24,19 +25,28 @@ class UserDetailsController {
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.FOUND)
     fun getProfile(id:Long): UserDetailsDTO{
+        //id from login security
         return travelerService.getProfile(id)
     }
 
-    @PostMapping("/profile")
+    @PutMapping("/profile")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun updateProfile(user : UserDetailsDTO){
         travelerService.updateProfile(user)
     }
 
-    @GetMapping("/ticket")
+    @GetMapping("/tickets")
     @ResponseStatus(HttpStatus.FOUND)
     fun getTickets(id:Long): List<TicketPurchasedDTO>{
         return travelerService.getTickets(id)
     }
+
+    @PostMapping("/tickets")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun buyTickets(id: Long, quantity: Int, zones: String){
+        travelerService.buyTickets(id, quantity, zones)
+    }
+
+
 
 }

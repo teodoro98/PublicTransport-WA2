@@ -16,9 +16,5 @@ interface TravelerService {
 
     fun getTravelers() : List<UserDetailsDTO>
 
-    fun findTraveler()
-
-    fun getTicketsOfTraveler()
-
 
 }

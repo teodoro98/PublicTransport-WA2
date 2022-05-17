@@ -62,7 +62,8 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}")clearSecret: S
             val purchasedTicket = TicketPurchased(
                 user,
                 java.sql.Timestamp(System.currentTimeMillis()),
-
+                java.sql.Timestamp(System.currentTimeMillis() + 3_600 * 1_000),
+                zones
             )
         }
     }
@@ -75,6 +76,7 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}")clearSecret: S
         }
         return usersList
     }
+
 
     // endpoints relative to GET /admin/traveler/{userID}/tickets and GET /admin/traveler/{userID}/profile use the
     // service functions getProfile and getTickets
