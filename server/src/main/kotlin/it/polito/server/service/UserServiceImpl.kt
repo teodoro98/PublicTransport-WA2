@@ -7,12 +7,16 @@ import it.polito.server.dto.*
 import it.polito.server.entity.Activation
 import it.polito.server.entity.User
 import it.polito.server.repository.*
+import it.polito.server.security.JwtUtils
+import it.polito.server.security.UserDetailsImpl
+import it.polito.server.security.WebSecurityConfig
 import org.apache.commons.validator.EmailValidator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Configuration
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.ResponseEntity
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.security.authentication.AuthenticationManager
@@ -20,6 +24,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -40,21 +45,26 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
     private lateinit var activationRepository : ActivationRepository
     @Autowired
     private lateinit var authenticationManager: AuthenticationManager
+    @Autowired
+    private lateinit var passwordEncoder: PasswordEncoder
+    @Autowired
+    private lateinit var jwtUtils: JwtUtils
 
     private val encodedSecret: String = Base64.getEncoder().encodeToString(clearSecret.toByteArray())
     private val algorithm: SignatureAlgorithm = SignatureAlgorithm.HS256
-    private val version: BCryptPasswordEncoder.BCryptVersion = BCryptPasswordEncoder.BCryptVersion.`$2A`
-    private val strenght: Int = 12
 
 
     override fun registerUser(user: UserDTO): Pair<UserProvDTO, Long> {
         this.validateUserData(user)
         val deadline = LocalDateTime.now().plusSeconds(20)
         try {
-            val encoder = BCryptPasswordEncoder(version, strenght)
+            val encoder = passwordEncoder
             val pwd = encoder.encode(user.password)
             val u = userRepository.save(User(null, user.nickname, user.email, pwd, User.Role.COSTUMER))
             val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
+
+            //u.active = true
+
             u.activation = a
             userRepository.save(u)
             return Pair(UserProvDTO(a.id, u.email), a.token)
@@ -68,7 +78,10 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
         val time = LocalDateTime.now()
         activationRepository.findByDeadline(time)?.forEach { it ->
             println("Cancellato per deadline" + it.toString() + "DELETED")
-            it.user.id?.let { id -> userRepository.deleteById(id) }
+            it.user.id?.let { id ->
+                val u = userRepository.findById(id).get()
+                if(!u.active) userRepository.deleteById(id)
+             }
             //activationRepository.deleteById(it.id!!)
         }
 
@@ -113,12 +126,12 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
         return m.matches()
     }
 
-    override fun loginUser(user: UserLoginDTO): String {
+    /*override fun loginUser(user: UserLoginDTO): String {
 
         val u : User? = userRepository.findByUsername(user.username)
 
         if (u != null) {
-            val encoder = BCryptPasswordEncoder(version, strenght)
+            val encoder = passwordEncoder
             if(encoder.matches(user.password, u.password)) {
                 val jwt = createJwt(user.username, u.role)
                 return jwt
@@ -128,28 +141,16 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
         } else {
             throw LoginUserNotFound()
         }
-    }
+    }*/
 
-    fun loginUser2(user: UserLoginDTO): String {
+    override fun loginUser(user: UserLoginDTO): String {
         val authentication: Authentication = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(user.username, user.password)
         )
         SecurityContextHolder.getContext().setAuthentication(authentication)
         val jwt: String = jwtUtils.generateJwtToken(authentication)
 
-        val userDetails: UserDetailsImpl = authentication.getPrincipal() as UserDetailsImpl
-        val roles: List<String> = userDetails.getAuthorities().stream()
-            .map { item -> item.getAuthority() }
-            .collect(Collectors.toList())
-        return ResponseEntity.ok(
-            JwtResponse(
-                jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles
-            )
-        )
+        return jwt
     }
 
     private fun createJwt(username: String, role: User.Role) : String {
