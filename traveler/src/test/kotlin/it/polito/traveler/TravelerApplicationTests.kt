@@ -76,7 +76,7 @@ class IntegrationTests {
         val id = HttpEntity(idLong)
 
 
-        //Test get profile correct case
+
         //var response = restTemplate.getForEntity<Unit>(
         //     "$baseUrl/my/getProfile/$id", UserDetailsDTO::javaClass, id
 
@@ -85,6 +85,7 @@ class IntegrationTests {
         // PROFILE
         //----------------------------------------------------------------------------------
 
+        //Test get profile correct case
         var responseGetProfile = restTemplate.getForEntity<UserDetailsDTO>(
             "$baseUrl/my/profile",
             id

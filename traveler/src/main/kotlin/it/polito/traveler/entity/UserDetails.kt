@@ -1,6 +1,7 @@
 package it.polito.traveler.entity
 
 import it.polito.traveler.dto.UserDetailsDTO
+import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDate
 import javax.persistence.*
 
