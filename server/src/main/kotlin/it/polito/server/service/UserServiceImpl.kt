@@ -77,7 +77,7 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
     override fun pruneExpiredActivation() {
         val time = LocalDateTime.now()
         activationRepository.findByDeadline(time)?.forEach { it ->
-            println("Cancellato per deadline" + it.toString() + "DELETED")
+
             it.user.id?.let { id ->
                 val u = userRepository.findById(id).get()
                 if(!u.active) userRepository.deleteById(id)
@@ -86,7 +86,7 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
         }
 
         activationRepository.findByDeadCounter()?.forEach { it ->
-            println("Cancellato per counter" +it.toString() + "DELETED")
+
             it.user.id?.let { id -> userRepository.deleteById(id) }
             //activationRepository.deleteById(it.id!!)
         }

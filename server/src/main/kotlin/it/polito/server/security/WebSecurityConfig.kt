@@ -31,7 +31,6 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
 
     @Bean
     fun passwordEncoder(): PasswordEncoder {
-        print("bean password encoder chiamato!")
         return BCryptPasswordEncoder(version, strenght)
     }
 

@@ -28,7 +28,9 @@ class AuthTokenFilter: OncePerRequestFilter() {
                 val userDetails: UserDetails = userDetailsService.loadUserByUsername(username)
                 val authentication = UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities()
+
                 )
+                println(authentication)
                 authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
                 SecurityContextHolder.getContext().authentication = authentication
             }
