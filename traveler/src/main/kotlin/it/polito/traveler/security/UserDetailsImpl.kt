@@ -2,14 +2,20 @@ package it.polito.traveler.security
 
 
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.stereotype.Component
 import java.util.stream.Collectors
-
-
-
-
 
 class UserDetailsImpl(private val id: Long, private val username : String, private val email: String, private val password: String,
                       private val authorities: Collection<GrantedAuthority?> ): org.springframework.security.core.userdetails.UserDetails {
+
+    fun getId(): Long{
+        return id
+    }
+
+    fun getEmail(): String{
+        return email
+    }
 
     override fun getPassword(): String {
         return password
@@ -39,16 +45,4 @@ class UserDetailsImpl(private val id: Long, private val username : String, priva
         return true
     }
 
-    fun build(user: User): UserDetailsImpl? {
-        val authorities: List<GrantedAuthority?> = user.getRoles().stream()
-            .map { role -> SimpleGrantedAuthority(role.getName().name()) }
-            .collect(Collectors.toList())
-        return UserDetailsImpl(
-            user.getId(),
-            user.getUsername(),
-            user.getEmail(),
-            user.getPassword(),
-            authorities
-        )
-    }
 }

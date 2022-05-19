@@ -8,6 +8,7 @@ import javax.persistence.*
 @Table(name= "ticketPurchased")
 class TicketPurchased (
     @ManyToOne
+    @JoinColumn(name = "buyer_id", referencedColumnName = "id")
     var buyer: UserDetails? = null,
 
     @Column(updatable = false, nullable = false)

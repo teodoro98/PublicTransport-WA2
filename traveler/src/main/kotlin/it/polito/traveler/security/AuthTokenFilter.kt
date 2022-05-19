@@ -1,11 +1,11 @@
 package it.polito.traveler.security
 
-import com.sun.tools.javac.util.StringUtils
+import antlr.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
-import org.springframework.util.StringUtils.hasText
 import org.springframework.web.filter.OncePerRequestFilter
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
@@ -24,8 +24,7 @@ class AuthTokenFilter: OncePerRequestFilter() {
         try {
             val jwt = parseJwt(request)
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                val username: String = jwtUtils.getUserNameFromJwtToken(jwt)
-                val userDetails: UserDetails = userDetailsService.loadUserByUsername(username)
+                val userDetails: UserDetails = jwtUtils.getUserFromJwtToken(jwt)
                 val authentication = UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities()
 
@@ -41,9 +40,12 @@ class AuthTokenFilter: OncePerRequestFilter() {
     }
 
     private fun parseJwt(request: HttpServletRequest): String? {
-        val headerAuth: String = request.getHeader("Authorization")
-        return if (headerAuth.isNotEmpty() && headerAuth.startsWith("Bearer ")) {
-            headerAuth.substring(7, headerAuth.length)
-        } else null
+        val headerAuth: String? = request.getHeader("Authorization")
+        if (headerAuth != null) {
+            if (headerAuth.isNotEmpty() && headerAuth.startsWith("Bearer ")) {
+                return headerAuth.substring(7, headerAuth.length)
+            }
+        }
+        return null
     }
 }

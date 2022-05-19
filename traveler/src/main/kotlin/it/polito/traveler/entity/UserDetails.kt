@@ -1,7 +1,6 @@
 package it.polito.traveler.entity
 
 import it.polito.traveler.dto.UserDetailsDTO
-import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDate
 import javax.persistence.*
 
@@ -28,7 +27,7 @@ class UserDetails (
     @Column(updatable = false, nullable = false)
     var id : Long? = null
 
-    @OneToMany(mappedBy = "ticketPurchased")
+    @OneToMany(mappedBy = "buyer")
     val ticketPurchased = mutableSetOf<TicketPurchased>()
 
     fun addTicket(t: TicketPurchased) {

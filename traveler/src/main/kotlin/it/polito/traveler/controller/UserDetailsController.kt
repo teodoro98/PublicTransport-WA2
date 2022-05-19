@@ -2,15 +2,13 @@ package it.polito.traveler.controller
 
 import it.polito.traveler.dto.TicketPurchasedDTO
 import it.polito.traveler.dto.UserDetailsDTO
+import it.polito.traveler.security.UserDetailsImpl
 import it.polito.traveler.service.TravelerServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/my")
@@ -26,13 +24,18 @@ class UserDetailsController {
     @ResponseStatus(HttpStatus.FOUND)
     fun getProfile(id:Long): UserDetailsDTO{
         //id from login security
-        return travelerService.getProfile(id)
+        val userDetails: UserDetailsImpl =
+            SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
+        return travelerService.getProfile(userDetails.getId())
     }
 
     @PutMapping("/profile")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun updateProfile(user : UserDetailsDTO){
-        travelerService.updateProfile(user)
+        /*val userDetails: UserDetailsImpl =
+            SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
+        val id = userDetails.getId()*/
+        travelerService.updateProfile(user/*, id*/)
     }
 
     @GetMapping("/tickets")
