@@ -12,6 +12,6 @@ interface UserService {
 
     fun pruneExpiredActivation()
 
-    fun loginUser(user: UserLoginDTO) : String
+    fun loginUser(user: UserLoginDTO) : JwtDTO
 
 }

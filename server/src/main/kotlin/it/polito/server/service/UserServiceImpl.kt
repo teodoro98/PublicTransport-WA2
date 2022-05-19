@@ -143,14 +143,14 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
         }
     }*/
 
-    override fun loginUser(user: UserLoginDTO): String {
+    override fun loginUser(user: UserLoginDTO): JwtDTO {
         val authentication: Authentication = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(user.username, user.password)
         )
         SecurityContextHolder.getContext().setAuthentication(authentication)
         val jwt: String = jwtUtils.generateJwtToken(authentication)
 
-        return jwt
+        return JwtDTO(jwt)
     }
 
     private fun createJwt(username: String, role: User.Role) : String {

@@ -39,7 +39,7 @@ class UserController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun login(@RequestBody user: UserLoginDTO): String {
+    fun login(@RequestBody user: UserLoginDTO): JwtDTO {
         val jwt = us.loginUser(user)
         return jwt
     }
