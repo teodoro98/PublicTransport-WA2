@@ -94,6 +94,7 @@ class IntegrationTests {
         Assertions.assertEquals(responseGetProfile.statusCode, HttpStatus.FOUND)
 
         //Test put profile correct case
+        /*
         var responsePutProfile = restTemplate.put(
             "$baseUrl/my/profile",
             updatedUserDetails

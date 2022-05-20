@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.*
 class AdminController {
 
     @Autowired
+    private lateinit var userDetailsRepository : UserDetailsRepository
+
+    @Autowired
     private lateinit var travelerService: TravelerServiceImpl
 
     @GetMapping("/travelers")
@@ -30,13 +33,15 @@ class AdminController {
     @GetMapping("/traveler/{userID}/profile")
     @PreAuthorize("hasRole('ADMIN')")
     fun getTravelerProfile(@PathVariable userID: Long): UserDetailsDTO{
-        return travelerService.getProfile(userID)
+        val username = userDetailsRepository.findById(userID).get().username
+        return travelerService.getProfile(username)
     }
 
     @GetMapping("/traveler/{userID}/tickets")
     @PreAuthorize("hasRole('ADMIN')")
     fun getTravelerTickets(@PathVariable userID: Long): List<TicketPurchasedDTO>{
-        return travelerService.getTickets(userID)
+        val username = userDetailsRepository.findById(userID).get().username
+        return travelerService.getTickets(username)
     }
 
 }

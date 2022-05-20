@@ -46,5 +46,6 @@ class WebSecurityConfig: WebSecurityConfigurerAdapter() {
             //.antMatchers("/admin/**").access("hasRole('ADMIN')")
             .anyRequest().authenticated()
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter::class.java)
+
     }
 }

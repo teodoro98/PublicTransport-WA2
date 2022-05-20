@@ -20,7 +20,6 @@ class UserDetailsController {
     private lateinit var travelerService: TravelerServiceImpl
 
 
-    //TODO dubbio: da dove si prende l'ID? Immaginiamo dal login ma non sappiamo poi come
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.FOUND)
     fun getProfile(id:Long): UserDetailsDTO{
@@ -32,23 +31,34 @@ class UserDetailsController {
 
     @PutMapping("/profile")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun updateProfile(user : UserDetailsDTO){
-        /*val userDetails: UserDetailsImpl =
+    fun updateProfile(@RequestBody user : UserDetailsDTO){
+        val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
-        val id = userDetails.getId()*/
-        travelerService.updateProfile(user/*, id*/)
+        val username = userDetails.username
+        travelerService.updateProfile(user, username)
     }
 
     @GetMapping("/tickets")
     @ResponseStatus(HttpStatus.FOUND)
-    fun getTickets(id:Long): List<TicketPurchasedDTO>{
-        return travelerService.getTickets(id)
+    fun getTickets(): List<TicketPurchasedDTO>{
+        val userDetails: UserDetailsImpl =
+            SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
+        val username = userDetails.username
+        return travelerService.getTickets(username)
     }
 
     @PostMapping("/tickets")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun buyTickets(id: Long, quantity: Int, zones: String){
-        travelerService.buyTickets(id, quantity, zones)
+
+    fun buyTickets(@RequestBody buyTickets: BuyTickets): List<TicketPurchasedDTO>{
+        if(buyTickets.cmd != "buy_tickets") {
+            throw CmdNotValid()
+        }
+        val userDetails: UserDetailsImpl =
+            SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
+        val username = userDetails.username
+        val tickets = travelerService.buyTickets(username, buyTickets.quantity, buyTickets.zones)
+        return tickets
     }
 
 

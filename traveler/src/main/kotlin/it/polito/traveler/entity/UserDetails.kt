@@ -8,7 +8,7 @@ import javax.persistence.*
 @Table(name= "userDetails")
 class UserDetails (
     @Column(updatable = true, nullable = false, )
-    var name: String,
+    var username: String,
     @Column(updatable = true, nullable = false, )
     var address: String,
     @Column(updatable = true, nullable = false, )
@@ -27,16 +27,6 @@ class UserDetails (
     @Column(updatable = false, nullable = false)
     var id : Long? = null
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-        generator = "user_generator")
-    @SequenceGenerator(name="user_generator",
-        sequenceName = "sequence_1",
-        initialValue = 1,
-        allocationSize = 1)
-    @Column(updatable = false, nullable = false)
-    var id : Long? = null
-
     @OneToMany(mappedBy = "buyer")
     val ticketPurchased = mutableSetOf<TicketPurchased>()
 
@@ -45,10 +35,8 @@ class UserDetails (
     }
 
     fun toDTOUserDetails(): UserDetailsDTO{
-        return UserDetailsDTO(id,name,address,dateOfBirth, telephoneNumber)
+        return UserDetailsDTO(id,username,address,dateOfBirth, telephoneNumber)
     }
 
-    enum class Role {
-        COSTUMER, ADMIN
-    }
+
 }

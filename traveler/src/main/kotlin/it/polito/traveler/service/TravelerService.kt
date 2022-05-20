@@ -10,7 +10,7 @@ interface TravelerService {
 
     fun updateProfile(userDetailsDTO: UserDetailsDTO, username: String)
 
-    fun getTickets(id : Long) : List<TicketPurchasedDTO>
+    fun getTickets(username : String) : List<TicketPurchasedDTO>
 
     fun buyTickets(id: Long, quantity: Int, zones: String)
 

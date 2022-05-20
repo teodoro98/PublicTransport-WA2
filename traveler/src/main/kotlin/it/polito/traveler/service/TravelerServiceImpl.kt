@@ -37,7 +37,7 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
         return user.toDTOUserDetails()
     }
 
-    override fun updateProfile(userDetailsDTO: UserDetailsDTO) {
+    override fun updateProfile(userDetailsDTO: UserDetailsDTO, username : String) {
         var user: UserDetails
         try {
             user = userDetailsRepository.findById(userDetailsDTO.id!!).get()
@@ -52,23 +52,35 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
     
     }
 
-    override fun getTickets(id: Long) : List<TicketPurchasedDTO> {
+    override fun getTickets(username : String) : List<TicketPurchasedDTO> {
         val listTickets = mutableListOf<TicketPurchasedDTO>()
-        val tickets = userDetailsRepository.findTicketsById(id)
-        for (t in tickets!!){
-            listTickets.add(t)
-        }
-        return listTickets
-    }
-
-    override fun buyTickets(id: Long, quantity: Int, zones: String) {
-        val purchasedTickets = mutableListOf<TicketPurchasedDTO>()
+        val id: Long = userDetailsRepository.findIdByUsername(username)?: throw UserDetailsNotFoundException()
         val user: UserDetails
         try {
             user = userDetailsRepository.findById(id).get()
         }catch (e : Exception){
             throw UserEmpty()
         }
+        val tickets = userDetailsRepository.findTicketsByUser(user)
+        for (t in tickets!!){
+            listTickets.add(TicketPurchasedDTO(t.id, t.issuedAt, t.expiry, t.zoneID,
+                createTicketJwt(t.id.toString(), t.issuedAt, t.expiry, t.zoneID)
+            ))
+        }
+        return listTickets
+    }
+
+    override fun buyTickets(username: String, quantity: Int, zones: String) : MutableList<TicketPurchasedDTO>{
+        val purchasedTickets = mutableListOf<TicketPurchasedDTO>()
+        val id: Long = userDetailsRepository.findIdByUsername(username)?: throw UserDetailsNotFoundException()
+        val user: UserDetails
+        try {
+            user = userDetailsRepository.findById(id).get()
+        }catch (e : Exception){
+            throw UserEmpty()
+        }
+
+
         repeat(quantity){
             val purchasedTicket = TicketPurchased(
                 user,
