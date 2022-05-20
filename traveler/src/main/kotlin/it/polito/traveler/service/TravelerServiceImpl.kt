@@ -76,6 +76,13 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
                 java.sql.Timestamp(System.currentTimeMillis() + 3_600 * 1_000),
                 zones
             )
+            ticketPurchasedRepository.save(purchasedTicket)
+            user.addTicket(purchasedTicket)
+            userDetailsRepository.save(user)
+
+            purchasedTickets.add(TicketPurchasedDTO(purchasedTicket.id, purchasedTicket.issuedAt, purchasedTicket.expiry, purchasedTicket.zoneID,
+                createTicketJwt(purchasedTicket.id.toString(), purchasedTicket.issuedAt, purchasedTicket.expiry, purchasedTicket.zoneID)
+            ))
         }
 
         return purchasedTickets
