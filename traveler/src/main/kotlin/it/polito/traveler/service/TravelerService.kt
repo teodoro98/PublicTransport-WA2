@@ -12,7 +12,7 @@ interface TravelerService {
 
     fun getTickets(username : String) : List<TicketPurchasedDTO>
 
-    fun buyTickets(id: Long, quantity: Int, zones: String)
+    fun buyTickets(username: String, quantity: Int, zones: String): MutableList<TicketPurchasedDTO>
 
     fun getTravelers() : List<UserDetailsDTO>
 

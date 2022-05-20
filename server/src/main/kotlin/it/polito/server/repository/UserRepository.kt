@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 
 interface UserRepository: CrudRepository<User, Long> {
     @Transactional
-    @Query("from User u where u.nickname<=:username")
+    @Query("from User u where u.nickname=:username")
     fun findByUsername(@Param("username")username : String): User?
 
 }

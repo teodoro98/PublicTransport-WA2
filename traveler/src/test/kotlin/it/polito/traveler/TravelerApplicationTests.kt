@@ -73,7 +73,7 @@ class IntegrationTests {
         userDetailsRepository.save(userDetails)
 
         //TODO id deve essere preso dalla security
-        val idLong = userDetailsRepository.findIdByName("Mario")!!
+        val idLong = userDetailsRepository.findIdByUsername("Mario")!!
         val id = HttpEntity(idLong)
 
 

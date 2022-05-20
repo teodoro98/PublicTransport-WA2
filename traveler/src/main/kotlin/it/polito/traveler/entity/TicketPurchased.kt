@@ -9,7 +9,7 @@ import javax.persistence.*
 class TicketPurchased (
     @ManyToOne
     @JoinColumn(name = "buyer_id", referencedColumnName = "id")
-    var buyer: UserDetails? = null,
+    var buyer: UserDetails,
 
     @Column(updatable = false, nullable = false)
     var issuedAt : Timestamp,
