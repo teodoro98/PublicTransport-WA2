@@ -6,5 +6,6 @@ data class TicketPurchasedDTO (
     val sub: Long?,
     val iat: Timestamp,
     val exp: Timestamp,
-    val zid: String
+    val zid: String,
+    val jws: String
 )

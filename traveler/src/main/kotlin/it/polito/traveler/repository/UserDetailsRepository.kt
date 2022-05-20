@@ -1,6 +1,7 @@
 package it.polito.traveler.repository
 
 import it.polito.traveler.dto.TicketPurchasedDTO
+import it.polito.traveler.entity.TicketPurchased
 import it.polito.traveler.entity.UserDetails
 import org.springframework.data.repository.CrudRepository
 import org.springframework.data.jpa.repository.Query
@@ -14,6 +15,8 @@ interface UserDetailsRepository: CrudRepository<UserDetails,Long> {
     fun findTicketsById(@Param("id")id : Long): List<TicketPurchasedDTO>?
 
     @Transactional
-    @Query("select u.id from UserDetails u where u.name<=:name")
-    fun findIdByName(@Param("name")name : String): Long?
+    @Query("select u.id from UserDetails u where u.username=:username")
+    fun findIdByUsername(@Param("username")username : String): Long?
+
+
 }

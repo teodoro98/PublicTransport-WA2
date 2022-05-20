@@ -8,5 +8,5 @@ data class UserDetailsDTO (
     val name:String,
     val address: String,
     val dateOfBirth:LocalDate,
-    val telephoneNumber: Number
+    val telephoneNumber: Long
 )

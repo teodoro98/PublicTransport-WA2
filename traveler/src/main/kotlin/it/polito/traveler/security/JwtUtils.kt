@@ -16,7 +16,7 @@ import java.util.stream.Collectors
 
 @Component
 class JwtUtils {
-    @Value("\${server.ticket.token.secret}")
+    @Value("\${server.login.token.secret}")
     private var jwtSecret: String = ""
 
     @Value("\${server.ticket.token.expirationms}")
@@ -61,8 +61,7 @@ class JwtUtils {
     fun getUserFromJwtToken(jwt: String): UserDetails {
         val username: String = getUserNameFromJwtToken(jwt)
         val roles = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["role"]
-        val id: Long = 1.toLong()
-        return UserDetailsImpl(id, username, "", "", listOf(SimpleGrantedAuthority(roles as String?)))
+        return UserDetailsImpl(username, "", listOf(SimpleGrantedAuthority(roles as String?)))
     }
 
     companion object {

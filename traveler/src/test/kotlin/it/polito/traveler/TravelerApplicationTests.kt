@@ -21,6 +21,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.LocalDate
@@ -97,8 +98,8 @@ class IntegrationTests {
             "$baseUrl/my/profile",
             updatedUserDetails
                    )
-        Assertions.assertEquals(responsePutProfile.statusCode, HttpStatus.ACCEPTED)
-
+        Assertions.assertEquals(responsePutProfile., HttpStatus.ACCEPTED)
+        */
         // TICKETS
         //----------------------------------------------------------------------------------
 

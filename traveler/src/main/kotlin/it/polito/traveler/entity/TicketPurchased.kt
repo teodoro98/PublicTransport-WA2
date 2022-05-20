@@ -31,9 +31,5 @@ class TicketPurchased (
     @Column(updatable = false, nullable = false)
     var id : Long? = null
 
-    fun toDTO():TicketPurchasedDTO{
-        return TicketPurchasedDTO(id,issuedAt,expiry,zoneID)
-    }
-
 
 }

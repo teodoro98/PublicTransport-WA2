@@ -6,9 +6,9 @@ import it.polito.traveler.entity.TicketPurchased
 
 interface TravelerService {
 
-    fun getProfile( id:Long ): UserDetailsDTO
+    fun getProfile( username:String ): UserDetailsDTO
 
-    fun updateProfile(userDetailsDTO: UserDetailsDTO)
+    fun updateProfile(userDetailsDTO: UserDetailsDTO, username: String)
 
     fun getTickets(id : Long) : List<TicketPurchasedDTO>
 

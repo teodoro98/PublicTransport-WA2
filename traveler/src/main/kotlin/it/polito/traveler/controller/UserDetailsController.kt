@@ -1,5 +1,6 @@
 package it.polito.traveler.controller
 
+import it.polito.traveler.dto.BuyTickets
 import it.polito.traveler.dto.TicketPurchasedDTO
 import it.polito.traveler.dto.UserDetailsDTO
 import it.polito.traveler.security.UserDetailsImpl
@@ -26,7 +27,7 @@ class UserDetailsController {
         //id from login security
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
-        return travelerService.getProfile(userDetails.getId())
+        return travelerService.getProfile(userDetails.username)
     }
 
     @PutMapping("/profile")

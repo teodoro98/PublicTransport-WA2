@@ -14,8 +14,18 @@ class UserDetails (
     @Column(updatable = true, nullable = false, )
     var dateOfBirth: LocalDate,
     @Column(updatable = true, nullable = false, )
-    var telephoneNumber: Number,
+    var telephoneNumber: Long,
         ) {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+        generator = "userdetail_generator")
+    @SequenceGenerator(name="userdetail_generator",
+        sequenceName = "sequence_1",
+        initialValue = 1,
+        allocationSize = 1)
+    @Column(updatable = false, nullable = false)
+    var id : Long? = null
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,

@@ -6,16 +6,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import java.util.stream.Collectors
 
-class UserDetailsImpl(private val id: Long, private val username : String, private val email: String, private val password: String,
+class UserDetailsImpl(private val username : String, private val password: String,
                       private val authorities: Collection<GrantedAuthority?> ): org.springframework.security.core.userdetails.UserDetails {
-
-    fun getId(): Long{
-        return id
-    }
-
-    fun getEmail(): String{
-        return email
-    }
 
     override fun getPassword(): String {
         return password
