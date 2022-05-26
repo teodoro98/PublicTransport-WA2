@@ -1,12 +1,13 @@
 package it.polito.ticketcatalogue.controller
 
-import it.polito.ticketcatalogue.dto.OrderCommittedDTO
-import it.polito.ticketcatalogue.dto.OrderDTO
-import it.polito.ticketcatalogue.dto.RequestOrderDTO
-import it.polito.ticketcatalogue.dto.TicketDTO
+import it.polito.ticketcatalogue.dto.*
+import it.polito.ticketcatalogue.entity.Order
 import it.polito.ticketcatalogue.entity.Ticket
+import it.polito.ticketcatalogue.repository.TicketRepository
 import it.polito.ticketcatalogue.security.UserDetailsImpl
 import it.polito.ticketcatalogue.service.TicketCatalogueServiceImpl
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
@@ -14,9 +15,20 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import org.slf4j.LoggerFactory
+import org.springframework.kafka.core.KafkaTemplate
+import org.springframework.kafka.support.KafkaHeaders
+import org.springframework.messaging.Message
+import org.springframework.messaging.support.MessageBuilder
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.web.reactive.function.client.WebClient
+import kotlinx.coroutines.flow.Flow
 
 @RestController
-class TicketCatalogueController {
+class TicketCatalogueController(
+) {
+    private val log = LoggerFactory.getLogger(javaClass)
 
     @Autowired
     private lateinit var catalogue: TicketCatalogueServiceImpl
@@ -29,12 +41,14 @@ class TicketCatalogueController {
 
     @PostMapping("/shop/{ticketid}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun purchaseTickets(@PathVariable(value="ticketid") ticketid: Long, @RequestParam requestOrder: RequestOrderDTO): Mono<OrderCommittedDTO> {
+    suspend fun purchaseTickets(@PathVariable(value="ticketid") ticketid: Long, @RequestParam requestOrder: RequestOrderDTO): Long {
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
-        val username : String = userDetails.username
+        val authToken: String =
+            SecurityContextHolder.getContext().getAuthentication().getCredentials().toString()
+        val id : Long = userDetails.getId()
 
-        // Trasmission to PaymentService
+        return catalogue.purchaseTickets(id, ticketid, requestOrder)
     }
 
     @GetMapping("/orders")
