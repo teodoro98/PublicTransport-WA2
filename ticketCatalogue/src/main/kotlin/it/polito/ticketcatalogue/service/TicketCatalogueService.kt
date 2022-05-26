@@ -7,15 +7,15 @@ import reactor.core.publisher.Mono
 
 interface TicketCatalogueService {
 
-    fun getCatalogue() : Flux<TicketDTO>
+    suspend fun getCatalogue() : Flow<TicketDTO>
 
-    fun purchaseTickets(username: String)
+    suspend fun purchaseTickets(buyerId: Long, ticketId: Long, requestOrder: RequestOrderDTO) : Long
 
-    fun getMyOrders(username: String) : Flux<OrderDTO>
+    suspend fun getMyOrders(buyerId: Long) : Flow<OrderDTO>
 
     fun getMyOrder(username: String, orderID: Long) : Mono<OrderDTO>
 
-    fun addTicketsToCatalogue(tickets: List<TicketDTO>)
+    suspend fun addTicketsToCatalogue(tickets: List<TicketDTO>)
 
     fun getALlOrders(): Flux<OrderDTO>
 

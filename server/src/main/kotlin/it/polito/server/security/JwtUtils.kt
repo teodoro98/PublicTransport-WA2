@@ -29,6 +29,7 @@ class JwtUtils {
             .setIssuedAt(Date())
             .setExpiration(Date(Date().time + jwtExpirationMs))
             .claim("role", "ROLE_${roles[0]}")
+            .claim("id", userPrincipal.getId())
             .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, jwtSecret)
             .compact()
     }

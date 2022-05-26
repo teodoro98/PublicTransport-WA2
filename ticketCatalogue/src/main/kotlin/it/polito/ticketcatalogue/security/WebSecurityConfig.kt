@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -44,18 +45,21 @@ class WebSecurityConfig {
     }
 
     @Bean
-    fun chain(http: ServerHttpSecurity): SecurityWebFilterChain {
-        http.cors().and().csrf().disable()
+    fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
 
+        http
+            .cors().and().csrf().disable()
+            .authorizeExchange()
+            .anyExchange().authenticated().and()
             .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-            .authorizeRequests()
-            //.antMatchers("/admin/**").access("hasRole('ADMIN')")
-            .anyRequest().authenticated()
+            .addFilterBefore(authenticationJwtTokenFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
 
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
-        return http.build();
+        return http.build()
+
+
+        /*.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()*/
+
 
     }
 }

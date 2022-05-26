@@ -1,24 +1,23 @@
 package it.polito.ticketcatalogue.security
 
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
+import org.springframework.security.web.server.ServerAuthenticationEntryPoint
 import org.springframework.stereotype.Component
+import org.springframework.web.server.ServerWebExchange
+import reactor.core.publisher.Mono
 import java.io.IOException
-import javax.servlet.ServletException
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
 
 @Component
-class AuthEntryPointJwt : AuthenticationEntryPoint {
+class AuthEntryPointJwt : ServerAuthenticationEntryPoint {
 
-    override fun commence(
-        request: HttpServletRequest, response: HttpServletResponse,
-        authException: AuthenticationException
-    ) {
-        logger.error("Unauthorized error: {}", authException.message)
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized")
+    override fun commence(exchange: ServerWebExchange, ex: AuthenticationException): Mono<Void> {
+        logger.error("Unauthorized error: {}", ex.message)
+        exchange.response.statusCode = HttpStatus.UNAUTHORIZED
+        return Mono.empty()
     }
 
     companion object {

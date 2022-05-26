@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.web.server.ServerWebExchange
 import org.springframework.web.server.WebFilter
 import org.springframework.web.server.WebFilterChain
@@ -30,7 +29,8 @@ class AuthTokenFilter: WebFilter {
 
                 )
                 println(authentication)
-                authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
+                /*val req = serverWebExchange.request
+                authentication.details = WebAuthenticationDetailsSource().buildDetails(serverWebExchange.request as javax.servlet.http.HttpServletRequest)*/
                 SecurityContextHolder.getContext().authentication = authentication
             }
         } catch (e: Exception) {

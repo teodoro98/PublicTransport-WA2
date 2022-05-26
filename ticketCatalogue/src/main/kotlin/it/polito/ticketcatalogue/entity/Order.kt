@@ -7,7 +7,8 @@ class Order(
     @Column(updatable = false, nullable = false)
     var quantity: Int,
     @Column(updatable = false, nullable = false)
-    var type: String,
+    var type: Ticket,
+
     @Column(updatable = false, nullable = false)
     var price: Double,
     @Column(updatable = true, nullable = false)
@@ -27,6 +28,12 @@ class Order(
 
     fun toOrderDTO(): OrderDTO {
         return OrderDTO(id, quantity,type,price,status,userId)
+    }
+
+    enum class Status {
+        PENDING,
+        SUCCESS,
+        FAILURE
     }
 
 }

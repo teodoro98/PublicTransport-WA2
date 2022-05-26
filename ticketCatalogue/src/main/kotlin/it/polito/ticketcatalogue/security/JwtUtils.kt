@@ -61,7 +61,8 @@ class JwtUtils {
     fun getUserFromJwtToken(jwt: String): UserDetails {
         val username: String = getUserNameFromJwtToken(jwt)
         val roles = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["role"]
-        return UserDetailsImpl(username, "", listOf(SimpleGrantedAuthority(roles as String?)))
+        val id = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["id"] as Long
+        return UserDetailsImpl(id, username, "", listOf(SimpleGrantedAuthority(roles as String?)))
     }
 
     companion object {

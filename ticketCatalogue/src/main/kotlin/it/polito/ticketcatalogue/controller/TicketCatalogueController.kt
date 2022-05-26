@@ -21,9 +21,9 @@ class TicketCatalogueController {
     @Autowired
     private lateinit var catalogue: TicketCatalogueServiceImpl
 
-    @GetMapping("/tickets")
+    @GetMapping("/tickets", produces = [org.springframework.http.MediaType.APPLICATION_NDJSON_VALUE])
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun getCatalogue(): Flux<TicketDTO> {
+    suspend fun getCatalogue(): Flow<TicketDTO> {
         return catalogue.getCatalogue()
     }
 
@@ -39,7 +39,7 @@ class TicketCatalogueController {
 
     @GetMapping("/orders")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun getMyOrders(): Flux<OrderDTO> {
+    suspend fun getMyOrders(): Flow<OrderDTO> {
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
         val username : String = userDetails.username
@@ -55,8 +55,8 @@ class TicketCatalogueController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/tickets")
-    fun addTicketsToCatalogue(@RequestBody tickets: List<TicketDTO>){
-
+    suspend fun addTicketsToCatalogue(@RequestBody tickets: List<TicketDTO>){
+        catalogue.addTicketsToCatalogue(tickets)
     }
 
     @PreAuthorize("hasRole('ADMIN')")
