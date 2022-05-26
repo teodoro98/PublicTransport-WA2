@@ -10,6 +10,7 @@ import org.springframework.web.server.WebFilterChain
 import reactor.core.publisher.Mono
 
 
+
 class AuthTokenFilter: WebFilter {
 
     @Autowired
@@ -34,7 +35,8 @@ class AuthTokenFilter: WebFilter {
                 SecurityContextHolder.getContext().authentication = authentication
             }
         } catch (e: Exception) {
-            logger.error("Cannot set user authentication: {}", e)
+            println("Cannot set user authentication: {$e}")
+
         }
 
         return webFilterChain.filter(serverWebExchange)

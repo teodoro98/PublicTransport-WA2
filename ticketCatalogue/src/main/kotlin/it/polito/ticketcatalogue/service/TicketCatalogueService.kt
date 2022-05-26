@@ -1,7 +1,9 @@
 package it.polito.ticketcatalogue.service
 
 import it.polito.ticketcatalogue.dto.OrderDTO
+import it.polito.ticketcatalogue.dto.RequestOrderDTO
 import it.polito.ticketcatalogue.dto.TicketDTO
+import kotlinx.coroutines.flow.Flow
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -13,11 +15,11 @@ interface TicketCatalogueService {
 
     suspend fun getMyOrders(buyerId: Long) : Flow<OrderDTO>
 
-    fun getMyOrder(username: String, orderID: Long) : Mono<OrderDTO>
+    suspend fun getMyOrder(orderID: Long) : OrderDTO
 
     suspend fun addTicketsToCatalogue(tickets: List<TicketDTO>)
 
-    fun getALlOrders(): Flux<OrderDTO>
+    suspend fun getAllOrders(): Flow<OrderDTO>
 
-    fun getOrdersOfUser(userId: Long) : Flux<OrderDTO>
+    suspend fun getOrdersOfUser(buyerId: Long) : Flow<OrderDTO>
 }

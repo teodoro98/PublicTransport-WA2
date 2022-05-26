@@ -39,28 +39,73 @@ class TicketCatalogueServiceImpl(
         return ticketRepository.findAll().map { it.toTicketDTO() }
     }
 
-    override fun purchaseTickets(username: String) {
-        TODO("Not yet implemented")
+    override suspend fun purchaseTickets(buyerId: Long, ticketId: Long, requestOrder: RequestOrderDTO): Long {
+        //TODO call travelerService API
+
+        val authN = SecurityContextHolder.getContext().authentication
+        val ticketEntity = ticketRepository.findById(ticketId)
+
+        if(ticketEntity != null) {
+            val tot = ticketEntity.price * requestOrder.quantity
+            val orderEntity = orderRepository.save(
+                Order(
+                    requestOrder.quantity,
+                    ticketEntity,
+                    tot,
+                    Order.Status.PENDING,
+                    buyerId
+                )
+            )
+
+            val order = OrderTopic(orderEntity.price, requestOrder.paymentInfo)
+
+            //TODO Trasmission to PaymentService
+            try {
+                log.info("Receiving product request")
+                log.info("Sending message to Kafka {}", order)
+                val message: Message<OrderTopic> = MessageBuilder
+                    .withPayload(order)
+                    .setHeader(KafkaHeaders.TOPIC, topic)
+                    .setHeader("X-Custom-Header", "Custom header here")
+                    .build()
+                kafkaTemplate.send(message)
+                log.info("Message sent with success")
+            } catch (e: Exception) {
+                log.error("Exception: {}", e)
+                // Create and handle InternalServerErrorException (Kafka)
+                throw Exception()
+            }
+
+            return orderEntity.id ?: 0
+        } else {
+            //TODO Create and handle NoTicketFoundException
+            throw Exception()
+        }
+
     }
 
-    override fun getMyOrders(username: String): Flux<OrderDTO> {
-        TODO("Not yet implemented")
+    override suspend fun getMyOrders(buyerId: Long): Flow<OrderDTO> {
+        return orderRepository.findByBuyerId(buyerId).map { it.toOrderDTO() }
     }
 
-    override fun getMyOrder(username: String, orderID: Long): Mono<OrderDTO> {
-        TODO("Not yet implemented")
+    override suspend fun getMyOrder(orderID: Long): OrderDTO {
+        val order = orderRepository.findById(orderID)
+            ?: //TODO create and handle OrderNotFoundException
+            throw Exception()
+        return order.toOrderDTO()
+
     }
 
     override suspend fun addTicketsToCatalogue(tickets: List<TicketDTO>) {
         ticketRepository.saveAll( tickets.map { Ticket(it.price,it.type)})
     }
 
-    override fun getALlOrders(): Flux<OrderDTO> {
-        TODO("Not yet implemented")
+    override suspend fun getAllOrders(): Flow<OrderDTO> {
+        return orderRepository.findAll().map { it.toOrderDTO() }
     }
 
-    override fun getOrdersOfUser(userId: Long): Flux<OrderDTO> {
-        TODO("Not yet implemented")
+    override suspend fun getOrdersOfUser(buyerId: Long): Flow<OrderDTO> {
+        return getMyOrders(buyerId)
     }
 
     private suspend fun retrieveUserDetails(): UserDetailsDTO {

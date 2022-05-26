@@ -33,6 +33,9 @@ class TicketCatalogueController(
     @Autowired
     private lateinit var catalogue: TicketCatalogueServiceImpl
 
+    @Autowired
+    private lateinit var ticketRepository : TicketRepository
+
     @GetMapping("/tickets", produces = [org.springframework.http.MediaType.APPLICATION_NDJSON_VALUE])
     @ResponseStatus(HttpStatus.ACCEPTED)
     suspend fun getCatalogue(): Flow<TicketDTO> {
@@ -56,15 +59,14 @@ class TicketCatalogueController(
     suspend fun getMyOrders(): Flow<OrderDTO> {
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
-        val username : String = userDetails.username
+        val buyerId : Long = userDetails.getId()
+        return catalogue.getMyOrders(buyerId)
     }
 
     @GetMapping("/orders/{orderId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun getMyOrder(@PathVariable(value="orderId") orderId: Long): Mono<OrderDTO> {
-        val userDetails: UserDetailsImpl =
-            SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
-        val username : String = userDetails.username
+    suspend fun getMyOrder(@PathVariable(value="orderId") orderId: Long): OrderDTO {
+        return catalogue.getMyOrder(orderId)
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -75,13 +77,15 @@ class TicketCatalogueController(
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/orders")
-    fun getAllOrders(): Flux<OrderDTO> {
-
+    suspend fun getAllOrders(): Flow<OrderDTO> {
+        return catalogue.getAllOrders()
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/orders/{userId}")
-    fun getOrdersOfUser(@PathVariable(value="orderId") userId: Long): Flux<OrderDTO> {
+    @GetMapping("/admin/orders/{user-id}")
+    suspend fun getOrdersOfUser(@PathVariable(value="user-id") buyerId: Long): Flow<OrderDTO> {
+        //DUBBIO posso mettere username al posto di userid?
+        return catalogue.getOrdersOfUser(buyerId)
 
     }
 }

@@ -6,15 +6,20 @@ import javax.persistence.*
 class Order(
     @Column(updatable = false, nullable = false)
     var quantity: Int,
+
+    @ManyToOne
+    @JoinColumn(name = "ticket", referencedColumnName = "type")
     @Column(updatable = false, nullable = false)
     var type: Ticket,
 
     @Column(updatable = false, nullable = false)
     var price: Double,
+
     @Column(updatable = true, nullable = false)
-    var status: String,
+    var status: Status,
+
     @Column(updatable = false, nullable = false)
-    var userId: Long?,
+    var buyerId: Long,
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,
@@ -27,7 +32,7 @@ class Order(
     val id: Long? = null
 
     fun toOrderDTO(): OrderDTO {
-        return OrderDTO(id, quantity,type,price,status,userId)
+        return OrderDTO(id, quantity, type.type,price,status.toString(),buyerId)
     }
 
     enum class Status {

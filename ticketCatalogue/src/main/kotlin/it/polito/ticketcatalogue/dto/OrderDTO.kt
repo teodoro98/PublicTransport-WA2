@@ -6,5 +6,5 @@ data class OrderDTO (
     val type: String,
     val price: Double,
     val status: String,
-    val userId: Long?
+    val buyerId: Long
         )
