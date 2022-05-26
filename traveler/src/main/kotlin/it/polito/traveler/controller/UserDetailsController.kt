@@ -23,7 +23,7 @@ class UserDetailsController {
     @GetMapping("/profile")
     @ResponseStatus(HttpStatus.FOUND)
     fun getProfile(): UserDetailsDTO{
-        //id from login security
+
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
         return travelerService.getProfile(userDetails.username)
