@@ -1,38 +1,33 @@
 package it.polito.ticketcatalogue.entity
 
 import it.polito.ticketcatalogue.dto.OrderDTO
-import javax.persistence.*
+import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Transient
+import org.springframework.data.relational.core.mapping.Table
 
+// TODO aggiungere lista di ticket acquistati
+@Table(name = "order_order")
 class Order(
-    @Column(updatable = false, nullable = false)
+    @Id
+    var id: Long? = null,
+
     var quantity: Int,
 
-    @ManyToOne
-    @JoinColumn(name = "ticket", referencedColumnName = "type")
-    @Column(updatable = false, nullable = false)
-    var type: Ticket,
+    @Transient
+    var type: Ticket?,
 
-    @Column(updatable = false, nullable = false)
+    var typeId: Long,
+
     var price: Double,
 
-    @Column(updatable = true, nullable = false)
     var status: Status,
 
-    @Column(updatable = false, nullable = false)
-    var buyerId: Long,
+    var buyerId: Long
 ) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,
-        generator = "user_generator")
-    @SequenceGenerator(name="user_generator",
-        sequenceName = "sequence_1",
-        initialValue = 1,
-        allocationSize = 1)
-    @Column(updatable = false, nullable = false)
-    val id: Long? = null
+
 
     fun toOrderDTO(): OrderDTO {
-        return OrderDTO(id, quantity, type.type,price,status.toString(),buyerId)
+        return OrderDTO(id, quantity, type!!.type,price,status.toString(),buyerId)
     }
 
     enum class Status {

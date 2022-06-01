@@ -5,7 +5,9 @@ import it.polito.ticketcatalogue.entity.Order
 import it.polito.ticketcatalogue.entity.Ticket
 import it.polito.ticketcatalogue.repository.OrderRepository
 import it.polito.ticketcatalogue.repository.TicketRepository
-import kotlinx.coroutines.flow.map
+import it.polito.ticketcatalogue.security.JwtUtils
+import it.polito.ticketcatalogue.security.UserDetailsImpl
+import kotlinx.coroutines.flow.*
 import org.apache.kafka.common.requests.DeleteAclsResponse.log
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -14,20 +16,19 @@ import org.springframework.http.MediaType
 import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.Message
 import org.springframework.messaging.support.MessageBuilder
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.kafka.core.KafkaTemplate
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.toList
 import org.springframework.web.reactive.function.client.*
+import java.time.LocalDate
 
 @Service
 class TicketCatalogueServiceImpl(
     @Value("\${kafka.topics.product}") val topic: String,
     @Value("\${service.traveler.uri}") val travelerServiceUri: String,
     @Autowired
-    private val kafkaTemplate: KafkaTemplate<String, Any>
+    private val kafkaTemplate: KafkaTemplate<String, Any>,
+    @Autowired
+    private val jwtUtils: JwtUtils
 ): TicketCatalogueService {
 
     @Autowired
@@ -39,27 +40,38 @@ class TicketCatalogueServiceImpl(
         return ticketRepository.findAll().map { it.toTicketDTO() }
     }
 
-    override suspend fun purchaseTickets(buyerId: Long, ticketId: Long, requestOrder: RequestOrderDTO): Long {
-        //TODO call travelerService API
+    override suspend fun purchaseTickets(userDetails: UserDetailsImpl, ticketId: Long, requestOrder: RequestOrderDTO): Long {
+        //val ticketEntity = ticketRepository.findOne(ticketId)
+        //val ticketEntity = ticketRepository.findById(ticketId)
 
-        val authN = SecurityContextHolder.getContext().authentication
-        val ticketEntity = ticketRepository.findById(ticketId)
+        val ticketEntity = ticketRepository.findAll().filter { it.id == ticketId }.single()
+
+        val buyerId = userDetails.getId()
 
         if(ticketEntity != null) {
+
+            if(!checkUserTicketCompatible(retrieveUserDetails(userDetails), ticketEntity)) {
+                //TODO handle and manage TicketNotCompatibleException()
+                throw TicketNotCompatibleException()
+            }
+
             val tot = ticketEntity.price * requestOrder.quantity
             val orderEntity = orderRepository.save(
                 Order(
+                    null,
                     requestOrder.quantity,
-                    ticketEntity,
+                    null,
+                    ticketEntity.id!!,
                     tot,
                     Order.Status.PENDING,
                     buyerId
                 )
             )
 
-            val order = OrderTopic(orderEntity.price, requestOrder.paymentInfo)
+            val paymentInfo = requestOrder.paymentInfo
 
-            //TODO Trasmission to PaymentService
+            val order = OrderTopic(orderEntity.price, paymentInfo)
+
             try {
                 log.info("Receiving product request")
                 log.info("Sending message to Kafka {}", order)
@@ -72,8 +84,8 @@ class TicketCatalogueServiceImpl(
                 log.info("Message sent with success")
             } catch (e: Exception) {
                 log.error("Exception: {}", e)
-                // Create and handle InternalServerErrorException (Kafka)
-                throw Exception()
+                //TODO Create and handle InternalServerErrorException (Kafka)
+                throw InternalServerErrorException()
             }
 
             return orderEntity.id ?: 0
@@ -108,22 +120,43 @@ class TicketCatalogueServiceImpl(
         return getMyOrders(buyerId)
     }
 
-    private suspend fun retrieveUserDetails(): UserDetailsDTO {
-        val jwt: String = ""
+    private suspend fun checkUserTicketCompatible(user: UserDetailsDTO, ticket: Ticket): Boolean {
+        return when (ticket.type) {
+            "young" -> {
+                // <18
+                user.dateOfBirth.plusYears(18).isBefore(LocalDate.now())
+            }
+            "elder" -> {
+                //>65
+                user.dateOfBirth.plusYears(65).isAfter(LocalDate.now())
+
+            }
+            else -> {
+                true
+            }
+        }
+    }
+
+    private suspend fun retrieveUserDetails(userDetails: UserDetailsImpl): UserDetailsDTO {
+        val jwt: String = jwtUtils.generateJwtToken(userDetails)
         //TODO revise the toFLow since it's only one element
         val result = WebClient
             .create(travelerServiceUri)
             .get()
-            .uri(travelerServiceUri + "/my/profile")
+            .uri("$travelerServiceUri/my/profile")
             .accept(MediaType.APPLICATION_JSON)
-            .header("Authentication", "Bearer: $jwt")
-            .exchangeToFlow { response ->
+            .header("Authorization", "Bearer $jwt")
+            .retrieve()
+            .awaitBody<UserDetailsDTO>()
+
+            /*.exchangeToFlow { response ->
                 if (response.statusCode() == HttpStatus.OK) {
                     response.bodyToFlow(UserDetailsDTO::class)
                 } else {
                     emptyFlow()
                 }
-            }.toList()[0]
+            }.single()*/
+        println("$result")
         return result
     }
 

@@ -1,4 +1,4 @@
-package it.polito.ticketcatalogue.security
+package it.polito.payment.security
 
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts

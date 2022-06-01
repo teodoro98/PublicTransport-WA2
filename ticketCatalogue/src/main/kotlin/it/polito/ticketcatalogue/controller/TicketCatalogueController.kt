@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.reactive.function.client.WebClient
 import kotlinx.coroutines.flow.Flow
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import java.security.Principal
 
 @RestController
 class TicketCatalogueController(
@@ -44,14 +46,10 @@ class TicketCatalogueController(
 
     @PostMapping("/shop/{ticketid}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    suspend fun purchaseTickets(@PathVariable(value="ticketid") ticketid: Long, @RequestParam requestOrder: RequestOrderDTO): Long {
-        val userDetails: UserDetailsImpl =
-            SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
-        val authToken: String =
-            SecurityContextHolder.getContext().getAuthentication().getCredentials().toString()
-        val id : Long = userDetails.getId()
+    suspend fun purchaseTickets(@PathVariable("ticketid") ticketid: Long, @RequestBody requestOrder: RequestOrderDTO, principal: Principal): Long {
+        val userDetails: UserDetailsImpl = (principal as UsernamePasswordAuthenticationToken).principal as UserDetailsImpl
 
-        return catalogue.purchaseTickets(id, ticketid, requestOrder)
+        return catalogue.purchaseTickets(userDetails, ticketid, requestOrder)
     }
 
     @GetMapping("/orders")
@@ -84,7 +82,6 @@ class TicketCatalogueController(
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/orders/{user-id}")
     suspend fun getOrdersOfUser(@PathVariable(value="user-id") buyerId: Long): Flow<OrderDTO> {
-        //DUBBIO posso mettere username al posto di userid?
         return catalogue.getOrdersOfUser(buyerId)
 
     }
