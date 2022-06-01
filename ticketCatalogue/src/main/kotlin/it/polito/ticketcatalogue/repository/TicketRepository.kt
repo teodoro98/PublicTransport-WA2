@@ -11,5 +11,8 @@ import org.springframework.transaction.annotation.Transactional
 @Repository
 interface TicketRepository : CoroutineCrudRepository<Ticket,Long>{
 
+    @Transactional
+    @Query("select * from ticket t where t.id=:id")
+    suspend fun findOne(@Param("id")id: Long): Ticket
 
 }

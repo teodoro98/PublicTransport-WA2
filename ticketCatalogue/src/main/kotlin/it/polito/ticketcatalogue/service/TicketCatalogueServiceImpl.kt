@@ -1,5 +1,9 @@
 package it.polito.ticketcatalogue.service
 
+import it.polito.ticketcatalogue.controller.InternalServerErrorException
+import it.polito.ticketcatalogue.controller.NoTicketFoundException
+import it.polito.ticketcatalogue.controller.OrderNotFoundException
+import it.polito.ticketcatalogue.controller.TicketNotCompatibleException
 import it.polito.ticketcatalogue.dto.*
 import it.polito.ticketcatalogue.entity.Order
 import it.polito.ticketcatalogue.entity.Ticket
@@ -37,6 +41,7 @@ class TicketCatalogueServiceImpl(
     private lateinit var ticketRepository :  TicketRepository
 
     override suspend fun getCatalogue(): Flow<TicketDTO> {
+        val ticketEntities = ticketRepository.findAll()
         return ticketRepository.findAll().map { it.toTicketDTO() }
     }
 
@@ -91,7 +96,7 @@ class TicketCatalogueServiceImpl(
             return orderEntity.id ?: 0
         } else {
             //TODO Create and handle NoTicketFoundException
-            throw Exception()
+            throw NoTicketFoundException()
         }
 
     }
@@ -103,13 +108,17 @@ class TicketCatalogueServiceImpl(
     override suspend fun getMyOrder(orderID: Long): OrderDTO {
         val order = orderRepository.findById(orderID)
             ?: //TODO create and handle OrderNotFoundException
-            throw Exception()
+            throw OrderNotFoundException()
         return order.toOrderDTO()
 
     }
 
     override suspend fun addTicketsToCatalogue(tickets: List<TicketDTO>) {
-        ticketRepository.saveAll( tickets.map { Ticket(it.price,it.type)})
+
+        for(t in tickets){
+            val tic= Ticket(null,t.price,t.type)
+            ticketRepository.save( tic)
+        }
     }
 
     override suspend fun getAllOrders(): Flow<OrderDTO> {

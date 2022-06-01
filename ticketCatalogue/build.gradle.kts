@@ -42,6 +42,7 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.24")
 }
 
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
