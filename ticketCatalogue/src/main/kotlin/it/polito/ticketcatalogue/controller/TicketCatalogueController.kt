@@ -62,8 +62,13 @@ class TicketCatalogueController(
 
     @GetMapping("/orders/{orderId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    suspend fun getMyOrder(@PathVariable(value="orderId") orderId: Long): OrderDTO {
-        return catalogue.getMyOrder(orderId)
+    suspend fun getMyOrder(@PathVariable(value="orderId") orderId: Long, principal: Principal): OrderDTO {
+        val userDetails: UserDetailsImpl = (principal as UsernamePasswordAuthenticationToken).principal as UserDetailsImpl
+        val order = catalogue.getMyOrder(orderId)
+        if(order.buyerId != userDetails.getId()) {
+            throw OrderNotFoundException()
+        }
+        return order
     }
 
     @PreAuthorize("hasRole('ADMIN')")

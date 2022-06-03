@@ -11,3 +11,5 @@
     cd docker
     docker compose up
     ```
+  
+User username can be retrived from DB, while password is set to ```Pwd123456&```
