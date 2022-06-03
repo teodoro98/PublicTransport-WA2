@@ -1,7 +1,8 @@
 CREATE TABLE IF NOT EXISTS transaction (
-                                      transaction_id BIGSERIAL PRIMARY KEY,
-                                      type TEXT NOT NULL,
-                                      status varchar(255) NOT NULL,
+                                      id BIGSERIAL NOT NULL,
                                       user_id BIGINT NOT NULL,
-                                      order_id BIGINT NOT NULL
+                                      order_id BIGINT NOT NULL,
+                                      credit_card_number varchar(255) not null,
+                                      card_holder varchar(255) not null,
+                                      CONSTRAINT pk_transaction_id PRIMARY KEY(id)
 );

@@ -6,12 +6,17 @@ import org.springframework.data.relational.core.mapping.Table
 
 @Table(name = "transaction")
 class Transaction(
-    @Id
-    val id : Long? = null,
+
     val userId : Long,
-    val orderId: Long
+    val orderId: Long,
+    val creditCardNumber: String,
+    val cardHolder: String
 ) {
+
+    @Id
+    var id : Long? = null
+
     fun toTransactionDTO() : TransactionDTO{
-        return TransactionDTO(id, userId, orderId)
+        return TransactionDTO(id, userId, orderId, creditCardNumber, cardHolder)
     }
 }

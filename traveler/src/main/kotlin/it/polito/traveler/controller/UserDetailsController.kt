@@ -49,7 +49,6 @@ class UserDetailsController {
 
     @PostMapping("/tickets")
     @ResponseStatus(HttpStatus.ACCEPTED)
-
     fun buyTickets(@RequestBody buyTickets: BuyTickets): List<TicketPurchasedDTO>{
         if(buyTickets.cmd != "buy_tickets") {
             throw CmdNotValid()

@@ -24,6 +24,7 @@ import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Service
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.web.reactive.function.client.*
+import reactor.core.publisher.Mono
 import java.time.LocalDate
 
 @Service
@@ -161,6 +162,41 @@ class TicketCatalogueServiceImpl(
             .awaitBody<UserDetailsDTO>()
         println("$result")
         return result
+    }
+
+    override suspend fun updateOrder(userDetails: UserDetailsImpl, orderId: Long, result: Boolean){
+        var status = Order.Status.FAILURE
+        if(result){
+            status = Order.Status.SUCCESS
+        }
+
+        val order: Order = orderRepository.findOrderById(orderId)//.filter { it.id==orderId }.single()
+        order.status=status
+        orderRepository.save(order)
+
+
+        val zones = "ABC"
+        val tickets = BuyTickets("buy_tickets", order.quantity, zones)
+
+        purchaseTicketService(userDetails, tickets)
+
+    }
+
+    private suspend fun purchaseTicketService(userDetails: UserDetailsImpl, tickets: BuyTickets) {
+        val jwt: String = jwtUtils.generateJwtToken(userDetails)
+
+        val result = WebClient
+            .create(travelerServiceUri)
+            .post()
+            .uri("$travelerServiceUri/my/tickets")
+            .accept(MediaType.APPLICATION_JSON)
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .header("Authorization", "Bearer $jwt")
+            .body(Mono.just(tickets), BuyTickets::class.java)
+            .retrieve()
+            .awaitBody<List<TicketPurchasedDTO>>()
+
+        println("$result")
     }
 
 
