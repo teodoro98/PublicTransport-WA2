@@ -23,4 +23,6 @@ interface TicketCatalogueService {
     suspend fun getAllOrders(): Flow<OrderDTO>
 
     suspend fun getOrdersOfUser(buyerId: Long) : Flow<OrderDTO>
+
+    suspend fun updateOrder(userDetails: UserDetailsImpl, orderId: Long, result: Boolean)
 }

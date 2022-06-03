@@ -54,9 +54,8 @@ class TicketCatalogueController(
 
     @GetMapping("/orders")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    suspend fun getMyOrders(): Flow<OrderDTO> {
-        val userDetails: UserDetailsImpl =
-            SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
+    suspend fun getMyOrders(principal: Principal): Flow<OrderDTO> {
+        val userDetails: UserDetailsImpl = (principal as UsernamePasswordAuthenticationToken).principal as UserDetailsImpl
         val buyerId : Long = userDetails.getId()
         return catalogue.getMyOrders(buyerId)
     }

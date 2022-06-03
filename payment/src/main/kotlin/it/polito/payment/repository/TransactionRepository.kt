@@ -11,6 +11,6 @@ import org.springframework.transaction.annotation.Transactional
 @Repository
 interface TransactionRepository: CoroutineCrudRepository<Transaction, Long> {
     @Transactional
-    @Query("select * from transaction t where t.userId=:buyerId")
+    @Query("select * from transaction t where t.user_id=:buyerId")
     fun findByUserId(@Param("userID")userID : Long): Flow<Transaction>
 }

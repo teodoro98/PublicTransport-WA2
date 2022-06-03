@@ -33,6 +33,8 @@ dependencies {
     implementation("org.springframework.security:spring-security-crypto:5.6.3")
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
     implementation("io.jsonwebtoken:jjwt:0.9.1")
+    // https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
+    implementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.kafka:spring-kafka-test")

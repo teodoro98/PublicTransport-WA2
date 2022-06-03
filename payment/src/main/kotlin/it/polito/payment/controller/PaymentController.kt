@@ -4,6 +4,7 @@ import it.polito.payment.dto.TransactionDTO
 import it.polito.payment.repository.TransactionRepository
 import it.polito.payment.security.UserDetailsImpl
 import it.polito.payment.service.PaymentService
+import it.polito.payment.service.PaymentServiceImpl
 import kotlinx.coroutines.flow.Flow
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +19,8 @@ import java.security.Principal
 @RestController
 class PaymentController {
 
-    private lateinit var paymentService: PaymentService
+    @Autowired
+    private lateinit var paymentService: PaymentServiceImpl
 
     @GetMapping("/admin/transactions")
     @ResponseStatus(HttpStatus.FOUND)

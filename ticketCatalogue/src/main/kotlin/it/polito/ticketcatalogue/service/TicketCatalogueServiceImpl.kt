@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.*
 import org.apache.kafka.common.requests.DeleteAclsResponse.log
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.kafka.support.KafkaHeaders
@@ -53,62 +54,61 @@ class TicketCatalogueServiceImpl(
 
         val buyerId = userDetails.getId()
 
-        if(ticketEntity != null) {
 
-            if(!checkUserTicketCompatible(retrieveUserDetails(userDetails), ticketEntity)) {
-                //TODO handle and manage TicketNotCompatibleException()
-                throw TicketNotCompatibleException()
-            }
 
-            val tot = ticketEntity.price * requestOrder.quantity
-            val orderEntity = orderRepository.save(
-                Order(
-                    null,
-                    requestOrder.quantity,
-                    null,
-                    ticketEntity.id!!,
-                    tot,
-                    Order.Status.PENDING,
-                    buyerId
-                )
-            )
-
-            val paymentInfo = requestOrder.paymentInfo
-
-            val order = OrderTopic(orderEntity.price, paymentInfo)
-
-            try {
-                log.info("Receiving product request")
-                log.info("Sending message to Kafka {}", order)
-                val message: Message<OrderTopic> = MessageBuilder
-                    .withPayload(order)
-                    .setHeader(KafkaHeaders.TOPIC, topic)
-                    .setHeader("X-Custom-Header", "Custom header here")
-                    .build()
-                kafkaTemplate.send(message)
-                log.info("Message sent with success")
-            } catch (e: Exception) {
-                log.error("Exception: {}", e)
-                //TODO Create and handle InternalServerErrorException (Kafka)
-                throw InternalServerErrorException()
-            }
-
-            return orderEntity.id ?: 0
-        } else {
-            //TODO Create and handle NoTicketFoundException
-            throw NoTicketFoundException()
+        if(!checkUserTicketCompatible(retrieveUserDetails(userDetails), ticketEntity)) {
+            throw TicketNotCompatibleException()
         }
+
+        val tot = ticketEntity.price * requestOrder.quantity
+        val orderEntity = orderRepository.save(
+            Order(
+                null,
+                requestOrder.quantity,
+                null,
+                ticketEntity.id!!,
+                tot,
+                Order.Status.PENDING,
+                buyerId
+            )
+        )
+
+        val paymentInfo = requestOrder.paymentInfo
+
+        val userOrder = UserOrder(userDetails.getId(), userDetails.username, userDetails.password, userDetails.authorities.elementAt(0)!!.authority)
+        val order = OrderTopic(userOrder, orderEntity.id!!, orderEntity.price, paymentInfo)
+
+        try {
+            log.info("Receiving product request")
+            log.info("Sending message to Kafka {}", order)
+            val message: Message<OrderTopic> = MessageBuilder
+                .withPayload(order)
+                .setHeader(KafkaHeaders.TOPIC, topic)
+                .setHeader("X-Custom-Header", "Custom header here")
+                .build()
+            kafkaTemplate.send(message)
+            log.info("Message sent with success")
+        } catch (e: Exception) {
+            log.error("Exception: {}", e)
+            throw InternalServerErrorException()
+        }
+
+        return orderEntity.id ?: 0
 
     }
 
     override suspend fun getMyOrders(buyerId: Long): Flow<OrderDTO> {
-        return orderRepository.findByBuyerId(buyerId).map { it.toOrderDTO() }
+        return orderRepository.findByBuyerId(buyerId).map {
+            it.type = ticketRepository.findAll().filter { it2 -> it2.id==it.typeId }.single()
+            it
+         }.map { it.toOrderDTO() }
     }
 
     override suspend fun getMyOrder(orderID: Long): OrderDTO {
         val order = orderRepository.findById(orderID)
-            ?: //TODO create and handle OrderNotFoundException
+            ?:
             throw OrderNotFoundException()
+        order.type = ticketRepository.findAll().filter { it.id==order.typeId }.single()
         return order.toOrderDTO()
 
     }
@@ -122,7 +122,10 @@ class TicketCatalogueServiceImpl(
     }
 
     override suspend fun getAllOrders(): Flow<OrderDTO> {
-        return orderRepository.findAll().map { it.toOrderDTO() }
+        return orderRepository.findAll().map {
+            it.type = ticketRepository.findAll().filter { it2 -> it2.id==it.typeId }.single()
+            it
+        }.map { it.toOrderDTO() }
     }
 
     override suspend fun getOrdersOfUser(buyerId: Long): Flow<OrderDTO> {
@@ -148,7 +151,6 @@ class TicketCatalogueServiceImpl(
 
     private suspend fun retrieveUserDetails(userDetails: UserDetailsImpl): UserDetailsDTO {
         val jwt: String = jwtUtils.generateJwtToken(userDetails)
-        //TODO revise the toFLow since it's only one element
         val result = WebClient
             .create(travelerServiceUri)
             .get()
@@ -157,14 +159,6 @@ class TicketCatalogueServiceImpl(
             .header("Authorization", "Bearer $jwt")
             .retrieve()
             .awaitBody<UserDetailsDTO>()
-
-            /*.exchangeToFlow { response ->
-                if (response.statusCode() == HttpStatus.OK) {
-                    response.bodyToFlow(UserDetailsDTO::class)
-                } else {
-                    emptyFlow()
-                }
-            }.single()*/
         println("$result")
         return result
     }
