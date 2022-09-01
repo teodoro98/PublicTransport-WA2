@@ -25,6 +25,16 @@ class TurnstileController {
         return turnstileService.getSecret()
     }
 
+    @GetMapping("turnstile/details")
+    @ResponseStatus(HttpStatus.FOUND)
+    @PreAuthorize("hasRole('ADMIN')")
+    suspend fun getTurnstileDetails() {
+
+        //val userDetails: UserDetailsImpl =
+        //    SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
+        //return turnstileService.getTurnistileDetails(userDetails)
+    }
+
     @PostMapping("turnstile/checkTicket")
     @ResponseStatus(HttpStatus.ACCEPTED)
     suspend fun checkTicket(@RequestBody qrCode: String): Boolean{

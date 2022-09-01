@@ -9,6 +9,8 @@ interface TravelerService {
 
     fun getProfile( username:String ): UserDetailsDTO
 
+    fun createProfile(userDetailsDTO: UserDetailsDTO, username : String)
+
     fun updateProfile(userDetailsDTO: UserDetailsDTO, username: String)
 
     fun getTickets(username : String) : List<TicketPurchasedDTO>

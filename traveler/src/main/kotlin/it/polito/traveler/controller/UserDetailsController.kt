@@ -8,6 +8,7 @@ import it.polito.traveler.service.TravelerServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 
@@ -30,6 +31,16 @@ class UserDetailsController {
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
         return travelerService.getProfile(userDetails.username)
     }
+
+    @PostMapping("/profile")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    fun createProfile(@RequestBody user: UserDetailsDTO){
+        val userDetails: UserDetailsImpl =
+            SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
+        val username = userDetails.username
+        travelerService.createProfile(user, username)
+        }
+
 
     @PutMapping("/profile")
     @ResponseStatus(HttpStatus.ACCEPTED)

@@ -36,6 +36,13 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
         return user.toDTOUserDetails()
     }
 
+    override fun createProfile(userDetailsDTO: UserDetailsDTO, username : String) {
+        var user = UserDetails(username, userDetailsDTO.address, userDetailsDTO.dateOfBirth, userDetailsDTO.telephoneNumber);
+
+        userDetailsRepository.save(user)
+
+    }
+
     override fun updateProfile(userDetailsDTO: UserDetailsDTO, username : String) {
         var user: UserDetails
         try {
