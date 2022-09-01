@@ -78,6 +78,13 @@ class TicketCatalogueController(
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin/tickets")
+    suspend fun modifyTicketToCatalogue(@RequestBody ticket: TicketDTO){
+        catalogue.modifyTicketToCatalogue(ticket)
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/orders")
     suspend fun getAllOrders(): Flow<OrderDTO> {
         return catalogue.getAllOrders()

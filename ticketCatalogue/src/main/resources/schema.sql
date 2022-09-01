@@ -2,7 +2,6 @@
 
 CREATE TABLE IF NOT EXISTS ticket (
                                       id BIGSERIAL NOT NULL ,
-                                      type TEXT NOT NULL,
                                       price double precision NOT NULL,
                                       CONSTRAINT pk_ticket_id PRIMARY KEY(id)
 

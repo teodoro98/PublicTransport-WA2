@@ -7,5 +7,8 @@ data class TicketPurchasedDTO (
     val iat: Timestamp,
     val exp: Timestamp,
     val zid: String,
+    val type : String,
+    val validitytime: Timestamp?,
+    val maxnumberOfRides :Int?,
     val jws: String
-)
+    )

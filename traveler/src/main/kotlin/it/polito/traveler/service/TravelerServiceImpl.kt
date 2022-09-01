@@ -62,14 +62,14 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
         }
         val tickets = userDetailsRepository.findTicketsByUser(user)
         for (t in tickets!!){
-            listTickets.add(TicketPurchasedDTO(t.id, t.issuedAt, t.expiry, t.zoneID,
-                createTicketJwt(t.id.toString(), t.issuedAt, t.expiry, t.zoneID)
+            listTickets.add(TicketPurchasedDTO(t.id, t.issuedAt, t.expiry, t.zoneID, t.type, t.validitytime, t.maxnumberOfRides,
+                createTicketJwt(t.id.toString(), t.issuedAt, t.expiry, t.zoneID, t.type, t.validitytime, t.maxnumberOfRides)
             ))
         }
         return listTickets
     }
 
-    override fun buyTickets(username: String, quantity: Int, zones: String) : MutableList<TicketPurchasedDTO>{
+    override fun buyTickets(username: String, quantity: Int, zones: String, type:String, validitytime:Timestamp?,  maxnumberOfRides : Int?) : MutableList<TicketPurchasedDTO>{
         val purchasedTickets = mutableListOf<TicketPurchasedDTO>()
         val id: Long = userDetailsRepository.findIdByUsername(username)?: throw UserDetailsNotFoundException()
         val user: UserDetails
@@ -85,14 +85,17 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
                 user,
                 java.sql.Timestamp(System.currentTimeMillis()),
                 java.sql.Timestamp(System.currentTimeMillis() + 3_600 * 1_000),
-                zones
+                zones,
+                type,
+                validitytime,
+                maxnumberOfRides
             )
             ticketPurchasedRepository.save(purchasedTicket)
             user.addTicket(purchasedTicket)
             userDetailsRepository.save(user)
 
-            purchasedTickets.add(TicketPurchasedDTO(purchasedTicket.id, purchasedTicket.issuedAt, purchasedTicket.expiry, purchasedTicket.zoneID,
-                createTicketJwt(purchasedTicket.id.toString(), purchasedTicket.issuedAt, purchasedTicket.expiry, purchasedTicket.zoneID)
+            purchasedTickets.add(TicketPurchasedDTO(purchasedTicket.id, purchasedTicket.issuedAt, purchasedTicket.expiry, purchasedTicket.zoneID, purchasedTicket.type, purchasedTicket.validitytime, purchasedTicket.maxnumberOfRides,
+                createTicketJwt(purchasedTicket.id.toString(), purchasedTicket.issuedAt, purchasedTicket.expiry, purchasedTicket.zoneID, purchasedTicket.type, purchasedTicket.validitytime, purchasedTicket.maxnumberOfRides)
             ))
         }
 
@@ -108,7 +111,7 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
         return usersList
     }
 
-    private fun createTicketJwt(sub: String, iat: Timestamp, exp: Timestamp, zid: String) : String {
+    private fun createTicketJwt(sub: String, iat: Timestamp, exp: Timestamp, zid: String, type: String, validitytime : Timestamp?, maxnumberOfRides : Int? ) : String {
         val encodedSecret: String = Base64.getEncoder().encodeToString(ticketSecret.toByteArray())
         val jws: String = Jwts.builder() // (1)
             .setSubject(sub) // (2)
@@ -116,6 +119,9 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
             .setIssuedAt(Date(iat.time))
             .setExpiration(Date(exp.time))
             .claim("zid", zid)
+            .claim("type", type)
+            .claim("validitytime", validitytime)
+            .claim("maxnumberOfRides", maxnumberOfRides)
             .compact()
         return jws
     }

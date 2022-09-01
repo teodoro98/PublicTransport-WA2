@@ -4,6 +4,7 @@ package it.polito.ticketcatalogue.entity
 import it.polito.ticketcatalogue.dto.TicketDTO
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
+import java.sql.Timestamp
 
 @Table(name = "ticket")
 class Ticket(

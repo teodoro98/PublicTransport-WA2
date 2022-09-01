@@ -38,13 +38,13 @@ class TurnstileServiceImpl(): TurnstileService  {
         val zid  = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["zid"] as String
 
         val type = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["type"] as String
-        //TYPE ticket, travelcard, carnet
+        //TYPE travelcard, carnet
 
         val validitytimeString = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["validitytime"]
         val validitytime = Timestamp.valueOf(validitytimeString as String);
 
 
-        val maxnumberOfRides = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["maxtransit"] as Int
+        val maxnumberOfRides = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["maxnumberOfRides"] as Int
 
 
         /*

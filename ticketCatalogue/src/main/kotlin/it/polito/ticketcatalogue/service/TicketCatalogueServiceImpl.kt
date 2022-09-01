@@ -174,11 +174,11 @@ class TicketCatalogueServiceImpl(
         order.status=status
         orderRepository.save(order)
 
+        val ticket = ticketRepository.findById(order.typeId)
 
-        val zones = "ABC"
-        val tickets = BuyTickets("buy_tickets", order.quantity, zones)
+        val ticketstopurchase = BuyTickets("buy_tickets", order.quantity, ticket!!.zone, ticket!!.type, ticket.validitytime, ticket.maxnumber_of_rides  )
 
-        purchaseTicketService(userDetails, tickets)
+        purchaseTicketService(userDetails, ticketstopurchase)
 
     }
 

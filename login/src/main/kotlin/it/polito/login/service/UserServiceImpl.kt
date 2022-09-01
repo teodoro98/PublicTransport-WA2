@@ -51,7 +51,7 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
 
     override fun registerUser(user: UserDTO): Pair<UserProvDTO, Long> {
         this.validateUserData(user)
-        val deadline = LocalDateTime.now().plusSeconds(20)
+        val deadline = LocalDateTime.now().plusSeconds(120)
         try {
             val encoder = passwordEncoder
             val pwd = encoder.encode(user.password)
