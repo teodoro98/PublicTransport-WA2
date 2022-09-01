@@ -1,5 +1,6 @@
 package it.polito.traveler.dto
 
+import java.sql.Time
 import java.sql.Timestamp
 
 data class TicketPurchasedDTO (

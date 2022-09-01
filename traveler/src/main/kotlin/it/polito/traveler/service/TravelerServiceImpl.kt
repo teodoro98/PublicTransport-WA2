@@ -13,7 +13,6 @@ import it.polito.traveler.repository.UserDetailsRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.security.Key
 import java.sql.Timestamp
 import java.time.LocalDate
 import java.util.*
@@ -67,6 +66,16 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
             ))
         }
         return listTickets
+    }
+
+    override fun getTicket(ticketId: Long): TicketPurchasedDTO {
+
+        val t = ticketPurchasedRepository.findById(ticketId).get();
+        val ticket = TicketPurchasedDTO(t.id, t.issuedAt, t.expiry, t.zoneID, t.type, t.validitytime, t.maxnumberOfRides,
+            createTicketJwt(t.id.toString(), t.issuedAt, t.expiry, t.zoneID, t.type, t.validitytime, t.maxnumberOfRides)
+        )
+        return ticket;
+
     }
 
     override fun buyTickets(username: String, quantity: Int, zones: String, type:String, validitytime:Timestamp?,  maxnumberOfRides : Int?) : MutableList<TicketPurchasedDTO>{

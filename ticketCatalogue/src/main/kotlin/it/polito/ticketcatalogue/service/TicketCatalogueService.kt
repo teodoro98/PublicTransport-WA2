@@ -20,6 +20,8 @@ interface TicketCatalogueService {
 
     suspend fun addTicketsToCatalogue(tickets: List<TicketDTO>)
 
+    suspend fun modifyTicketToCatalogue(ticket: TicketDTO)
+
     suspend fun getAllOrders(): Flow<OrderDTO>
 
     suspend fun getOrdersOfUser(buyerId: Long) : Flow<OrderDTO>

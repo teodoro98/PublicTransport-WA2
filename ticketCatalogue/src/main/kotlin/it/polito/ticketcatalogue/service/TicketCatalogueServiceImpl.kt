@@ -117,10 +117,18 @@ class TicketCatalogueServiceImpl(
     override suspend fun addTicketsToCatalogue(tickets: List<TicketDTO>) {
 
         for(t in tickets){
-            val tic= Ticket(null,t.price,t.type)
+            val tic= Ticket(null,t.price, t.zone, t.type, t.validitytime, t.maxnumber_of_rides)
             ticketRepository.save( tic)
         }
     }
+
+
+    override suspend fun modifyTicketToCatalogue(ticket: TicketDTO) {
+
+            val tic= Ticket(ticket.ticketID,ticket.price, ticket.zone, ticket.type, ticket.validitytime, ticket.maxnumber_of_rides)
+            ticketRepository.save(tic)
+        }
+
 
     override suspend fun getAllOrders(): Flow<OrderDTO> {
         return orderRepository.findAll().map {

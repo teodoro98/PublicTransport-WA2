@@ -3,6 +3,10 @@
 CREATE TABLE IF NOT EXISTS ticket (
                                       id BIGSERIAL NOT NULL ,
                                       price double precision NOT NULL,
+                                      zone TEXT NOT NULL,
+                                      type TEXT NOT NULL,
+                                      validitytime TIMESTAMP,
+                                      maxnumber_of_rides INT,
                                       CONSTRAINT pk_ticket_id PRIMARY KEY(id)
 
 );

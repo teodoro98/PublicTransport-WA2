@@ -49,6 +49,19 @@ class UserDetailsController {
         return travelerService.getTickets(username)
     }
 
+    @GetMapping("/ticket/{ticket-id}/qrcode")
+    @ResponseStatus(HttpStatus.FOUND)
+    fun getQr(@PathVariable(value="user-id") ticketId: Long): String{
+        val userDetails: UserDetailsImpl =
+            SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
+        val username = userDetails.username
+        val jws= travelerService.getTicket(ticketId).jws;
+
+        //val bitmap = generateQRCode("jwt")
+
+        return jws;
+    }
+
     @PostMapping("/tickets")
     @ResponseStatus(HttpStatus.ACCEPTED)
     fun buyTickets(@RequestBody buyTickets: BuyTickets): List<TicketPurchasedDTO>{
@@ -58,7 +71,7 @@ class UserDetailsController {
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
         val username = userDetails.username
-        val tickets = travelerService.buyTickets(username, buyTickets.quantity, buyTickets.zones)
+        val tickets = travelerService.buyTickets(username, buyTickets.quantity, buyTickets.zones, buyTickets.type, buyTickets.validitytime, buyTickets.maxnumberOfRides)
         return tickets
     }
 

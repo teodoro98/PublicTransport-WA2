@@ -95,5 +95,6 @@ class TicketCatalogueController(
     suspend fun getOrdersOfUser(@PathVariable(value="user-id") buyerId: Long): Flow<OrderDTO> {
         return catalogue.getOrdersOfUser(buyerId)
 
+
     }
 }

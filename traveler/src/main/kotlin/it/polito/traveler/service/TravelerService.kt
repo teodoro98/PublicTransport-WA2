@@ -3,6 +3,7 @@ package it.polito.traveler.service
 import it.polito.traveler.dto.TicketPurchasedDTO
 import it.polito.traveler.dto.UserDetailsDTO
 import it.polito.traveler.entity.TicketPurchased
+import java.sql.Timestamp
 
 interface TravelerService {
 
@@ -12,7 +13,9 @@ interface TravelerService {
 
     fun getTickets(username : String) : List<TicketPurchasedDTO>
 
-    fun buyTickets(username: String, quantity: Int, zones: String): MutableList<TicketPurchasedDTO>
+    fun getTicket(ticketId : Long) : TicketPurchasedDTO
+
+    fun buyTickets(username: String, quantity: Int, zones: String, type:String, validitytime: Timestamp?, maxnumberOfRides : Int?) : MutableList<TicketPurchasedDTO>
 
     fun getTravelers() : List<UserDetailsDTO>
 
