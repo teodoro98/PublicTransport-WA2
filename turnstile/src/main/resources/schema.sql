@@ -1,3 +1,11 @@
+CREATE TABLE IF NOT EXISTS turnstile_details
+(
+    id BIGSERIAL NOT NULL,
+    username TEXT NOT NULL,
+    zoneid TEXT NOT NULL,
+    CONSTRAINT pk_turnstile_id PRIMARY KEY(id)
+);
+
 CREATE TABLE IF NOT EXISTS transit
 (
     id BIGSERIAL NOT NULL,

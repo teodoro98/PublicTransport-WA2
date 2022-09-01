@@ -6,9 +6,6 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
-
-
-
 @Table(name = "transit")
 class Transit(
     @Id
@@ -20,7 +17,7 @@ class Transit(
 
 
     fun toDTO(): TransitDTO {
-        return TransitDTO(id!!, ticketId, turnstileId, date)
+        return TransitDTO(id, ticketId, turnstileId, date)
     }
 
 
