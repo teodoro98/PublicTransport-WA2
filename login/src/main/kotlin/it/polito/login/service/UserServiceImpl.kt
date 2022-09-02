@@ -58,7 +58,7 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
     private var logger: Logger = LoggerFactory.getLogger(UserServiceImpl::class.java)
 
     override fun registerUser(user: UserDTO, roles: MutableList<User.Role>): Pair<UserProvDTO?, Long?> {
-        this.validateUserData(user)
+        this.validateUserData(user, roles)
         val deadline = LocalDateTime.now().plusSeconds(activationExpire.toLong())
         try {
             val encoder = passwordEncoder
@@ -109,9 +109,16 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
 
     }
 
-    override fun validateUserData(user: UserDTO) {
+    override fun validateUserData(user: UserDTO, roles: MutableList<User.Role>) {
         if(user.nickname.isEmpty() || user.password.isEmpty() || user.email.isEmpty()) throw UserEmpty()
         if(!EmailValidator.getInstance().isValid(user.email)) throw EmailNotValid()
+        if(roles.contains(User.Role.ROLE_COSTUMER) || roles.contains(User.Role.ROLE_ADMIN)) {
+            //val condition = if (roles.contains(User.Role.ROLE_COSTUMER)) User.Role.ROLE_COSTUMER else User.Role.ROLE_ADMIN
+            val result = userRepository.findAll().count { u ->
+                (u.role.contains(User.Role.ROLE_COSTUMER) || u.role.contains(User.Role.ROLE_ADMIN)) && u.email == user.email
+            }
+            if(result > 0) throw UserNotUnique()
+        }
         if(!this.validatePassword(user.password)) throw UserPasswordNotStrong()
     }
 

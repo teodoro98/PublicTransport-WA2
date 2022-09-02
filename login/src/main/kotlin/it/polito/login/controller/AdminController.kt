@@ -23,14 +23,14 @@ class AdminController {
     @PreAuthorize("hasRole('ADMIN') and hasRole('RECRUITER')")
     @ResponseStatus(HttpStatus.CREATED)
     fun registration(@RequestBody user: AdminDTO): UserProvDTO {
-        val u = toUserDTO(user)
-        userService.validateUserData(u)
-        u.active = true
+        val u = AdminDTO.toUserDTO(user)
         val roles: MutableList<User.Role> = if(user.recruiter) {
             mutableListOf(User.Role.ROLE_ADMIN, User.Role.ROLE_RECRUITER)
         } else {
             mutableListOf(User.Role.ROLE_ADMIN)
         }
+        userService.validateUserData(u, roles)
+        u.active = true
         val tuple = userService.registerUser(u, roles)
         if(tuple.first != null && tuple.second != null) {
             tuple.first!!.provisional_id?.let { emailService.sendEmail(user.email, tuple.second!!, it) }

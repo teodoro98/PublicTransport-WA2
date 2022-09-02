@@ -5,7 +5,7 @@ import it.polito.login.entity.User
 
 interface UserService {
 
-    fun validateUserData(user: UserDTO)
+    fun validateUserData(user: UserDTO, roles: MutableList<User.Role>)
 
     fun validateUserEmail(validation : ValidationDTO): UserSlimDTO
 

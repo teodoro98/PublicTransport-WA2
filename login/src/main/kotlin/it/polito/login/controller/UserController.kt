@@ -34,9 +34,10 @@ class UserController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     fun registration(@RequestBody user: UserDTO): UserProvDTO {
-        us.validateUserData(user)
+        val roles = mutableListOf(User.Role.ROLE_COSTUMER)
+        us.validateUserData(user, roles)
         user.active = false
-        val tuple = us.registerUser(user, mutableListOf(User.Role.ROLE_COSTUMER))
+        val tuple = us.registerUser(user, roles)
         if(tuple.first != null && tuple.second != null) {
             tuple.first!!.provisional_id?.let { emailService.sendEmail(user.email, tuple.second!!, it) }
             logger.info("Email sent at ${LocalDateTime.now()}")

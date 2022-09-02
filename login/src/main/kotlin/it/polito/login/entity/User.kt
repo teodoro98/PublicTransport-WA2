@@ -16,7 +16,7 @@ class User (
     @Column(updatable = true, nullable = false, unique = true)
     var nickname: String,
 
-    @Column(updatable = true, nullable = false, unique = true)
+    @Column(updatable = true, nullable = false)
     var email: String,
 
     @Column(updatable = true, nullable = false)
@@ -59,7 +59,7 @@ class User (
     }
 
     enum class Role {
-        ROLE_COSTUMER, ROLE_ADMIN, ROLE_RECRUITER
+        ROLE_COSTUMER, ROLE_ADMIN, ROLE_RECRUITER, ROLE_TURNSTILE
     }
 
 }
