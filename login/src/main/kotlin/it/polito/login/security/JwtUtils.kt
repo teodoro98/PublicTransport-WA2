@@ -7,6 +7,8 @@ import io.jsonwebtoken.UnsupportedJwtException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import java.util.*
 import java.util.stream.Collectors
@@ -28,7 +30,8 @@ class JwtUtils {
             .setSubject(userPrincipal.getUsername())
             .setIssuedAt(Date())
             .setExpiration(Date(Date().time + jwtExpirationMs))
-            .claim("role", "ROLE_${roles[0]}")
+            .claim("roles", roles.toString())
+            //.claim("role", "ROLE_${roles[0]}")
             .claim("id", userPrincipal.getId())
             .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, jwtSecret)
             .compact()
@@ -54,6 +57,22 @@ class JwtUtils {
             logger.error("JWT claims string is empty: {}", e.message)
         }
         return false
+    }
+
+    fun getUserFromJwtToken(jwt: String): UserDetailsImpl {
+        val username: String = getUserNameFromJwtToken(jwt)
+        val rolesParsed = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["roles"]
+        val roles = mutableListOf<GrantedAuthority>()
+        val listString: String = rolesParsed.toString().substring(1, rolesParsed.toString().length - 1)
+        val stringToken = StringTokenizer(listString, ",")
+        for (token in stringToken) {
+            if(token is String) {
+                roles.add(SimpleGrantedAuthority((token).trim()))
+            }
+        }
+
+        val id = (Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["id"] as Int).toLong()
+        return UserDetailsImpl(id, username, "", "", roles)
     }
 
     companion object {

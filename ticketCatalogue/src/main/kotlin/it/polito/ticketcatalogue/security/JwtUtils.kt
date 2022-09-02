@@ -6,13 +6,9 @@ import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.UnsupportedJwtException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Component
-import java.security.Principal
 import java.util.*
 import java.util.stream.Collectors
 
@@ -32,7 +28,7 @@ class JwtUtils {
             .setSubject(userPrincipal.username)
             .setIssuedAt(Date())
             .setExpiration(Date(Date().time + jwtExpirationMs))
-            .claim("role", roles[0])
+            .claim("roles", roles.toString())
             .claim("id", userPrincipal.getId())
             .signWith(io.jsonwebtoken.SignatureAlgorithm.HS256, jwtSecret)
             .compact()
@@ -60,11 +56,20 @@ class JwtUtils {
         return false
     }
 
-    fun getUserFromJwtToken(jwt: String): UserDetails {
+    fun getUserFromJwtToken(jwt: String): UserDetailsImpl {
         val username: String = getUserNameFromJwtToken(jwt)
-        val roles = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["role"]
-        val id = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["id"] as Int
-        return UserDetailsImpl(id.toLong(), username, "", listOf(SimpleGrantedAuthority(roles as String?)))
+        val rolesParsed = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["roles"]
+        val roles = mutableListOf<GrantedAuthority>()
+        val listString: String = rolesParsed.toString().substring(1, rolesParsed.toString().length - 1)
+        val stringToken = StringTokenizer(listString, ",")
+        for (token in stringToken) {
+            if(token is String) {
+                roles.add(SimpleGrantedAuthority((token).trim()))
+            }
+        }
+
+        val id = (Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["id"] as Int).toLong()
+        return UserDetailsImpl(id, username, "", roles)
     }
 
     companion object {

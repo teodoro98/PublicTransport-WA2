@@ -12,5 +12,4 @@ class LoginApplication
 
 fun main(args: Array<String>) {
     runApplication<LoginApplication>(*args)
-
 }

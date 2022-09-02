@@ -8,8 +8,6 @@ import it.polito.traveler.service.TravelerServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.User
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 
 
@@ -66,12 +64,14 @@ class UserDetailsController {
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
         val username = userDetails.username
-        val jws= travelerService.getTicket(ticketId).jws;
+        val jws= travelerService.getTicket(ticketId).jws
 
         //val bitmap = generateQRCode("jwt")
 
-        return jws;
+        return jws
     }
+
+
 
     @PostMapping("/tickets")
     @ResponseStatus(HttpStatus.ACCEPTED)

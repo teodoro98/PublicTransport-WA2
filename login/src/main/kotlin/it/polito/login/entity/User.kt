@@ -1,8 +1,8 @@
 package it.polito.login.entity
 
 import it.polito.login.dto.UserDTO
-import it.polito.login.dto.UserSlimDTO
 import it.polito.login.dto.UserLoginDTO
+import it.polito.login.dto.UserSlimDTO
 import javax.persistence.*
 
 
@@ -19,15 +19,19 @@ class User (
     @Column(updatable = true, nullable = false, unique = true)
     var email: String,
 
-    @Column(updatable = true, nullable = false, )
+    @Column(updatable = true, nullable = false)
     var password: String,
 
-    @Column(updatable = true, nullable = false, )
-    var role : Role,
+
+    @Column(updatable = true, nullable = false)
+    @ElementCollection(fetch=FetchType.EAGER, targetClass = Role::class)
+    @CollectionTable(name = "TBL_USER_ROLE", joinColumns = [JoinColumn(name = "nickname")])
+    @Enumerated(EnumType.STRING)
+    var role : MutableCollection<Role>,
 
    ) {
 
-    @Column(updatable = true, nullable = false, )
+    @Column(updatable = true, nullable = false)
     var active : Boolean = false
 
     @Id
@@ -55,7 +59,7 @@ class User (
     }
 
     enum class Role {
-        COSTUMER, ADMIN
+        ROLE_COSTUMER, ROLE_ADMIN, ROLE_RECRUITER
     }
 
 }
