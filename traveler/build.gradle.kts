@@ -26,6 +26,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("commons-validator:commons-validator:1.7")
+    implementation("io.github.g0dkar:qrcode-kotlin-jvm:3.2.0")
     // https://mvnrepository.com/artifact/com.github.vladimir-bukhtoyarov/bucket4j-core
     implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.4.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.6.7")

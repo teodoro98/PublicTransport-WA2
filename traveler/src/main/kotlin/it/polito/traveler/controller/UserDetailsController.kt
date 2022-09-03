@@ -1,15 +1,18 @@
 package it.polito.traveler.controller
 
+import io.github.g0dkar.qrcode.QRCode
 import it.polito.traveler.dto.BuyTicketsDTO
 import it.polito.traveler.dto.TicketPurchasedDTO
 import it.polito.traveler.dto.UserDetailsDTO
 import it.polito.traveler.security.UserDetailsImpl
 import it.polito.traveler.service.TravelerServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType.IMAGE_PNG_VALUE
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
-
+import java.io.ByteArrayOutputStream
 
 
 @RestController
@@ -60,15 +63,20 @@ class UserDetailsController {
 
     @GetMapping("/ticket/{ticket-id}/qrcode")
     @ResponseStatus(HttpStatus.FOUND)
-    fun getQr(@PathVariable(value="user-id") ticketId: Long): String{
+    fun getQr(@PathVariable(value="user-id") ticketId: Long): ByteArrayResource{
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
         val username = userDetails.username
         val jws= travelerService.getTicket(ticketId).jws
 
-        //val bitmap = generateQRCode("jwt")
 
-        return jws
+        val imageOut = ByteArrayOutputStream()
+        QRCode(jws).render().writeImage(imageOut)
+
+        val imageBytes = imageOut.toByteArray()
+        val resource = ByteArrayResource(imageBytes, IMAGE_PNG_VALUE)
+
+        return resource;
     }
 
 
