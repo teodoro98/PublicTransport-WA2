@@ -27,7 +27,7 @@ class UserDetails (
     @Column(updatable = false, nullable = false)
     var id : Long? = null
 
-    @OneToMany(mappedBy = "buyer")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "buyer")
     val ticketPurchased = mutableSetOf<TicketPurchased>()
 
     fun addTicket(t: TicketPurchased) {

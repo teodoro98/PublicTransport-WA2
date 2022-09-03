@@ -17,7 +17,7 @@ interface TravelerService {
 
     fun getTicket(ticketId : Long) : TicketPurchasedDTO
 
-    fun buyTickets(username: String, quantity: Int, zones: String, type:String, validitytime: Timestamp?, maxnumberOfRides : Int?) : MutableList<TicketPurchasedDTO>
+    fun buyTickets(result: Boolean, username: String, quantity: Int, zones: String, type:String, validitytime: Timestamp?, maxnumberOfRides : Int?)
 
     fun getTravelers() : List<UserDetailsDTO>
 

@@ -1,8 +1,8 @@
-package it.polito.ticketcatalogue.dto
+package it.polito.traveler.dto
 
 import java.sql.Timestamp
 
-data class BuyTickets(
+data class BuyTicketsDTO(
     val cmd: String,
     val quantity: Int,
     val zones: String,

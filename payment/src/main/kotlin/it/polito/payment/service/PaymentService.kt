@@ -1,6 +1,6 @@
 package it.polito.payment.service
 
-import it.polito.payment.dto.OrderTopic
+import it.polito.payment.dto.OrderMessage
 import it.polito.payment.dto.TransactionDTO
 import kotlinx.coroutines.flow.Flow
 
@@ -10,5 +10,5 @@ interface PaymentService {
 
     suspend fun getUserTransactions(userId: Long): Flow<TransactionDTO>
 
-    suspend fun issuePayment(orderTopic: OrderTopic)
+    suspend fun issuePayment(orderTopic: OrderMessage)
 }

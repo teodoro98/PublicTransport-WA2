@@ -85,7 +85,10 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
 
     }
 
-    override fun buyTickets(username: String, quantity: Int, zones: String, type:String, validitytime:Timestamp?,  maxnumberOfRides : Int?) : MutableList<TicketPurchasedDTO>{
+    override fun buyTickets(result:Boolean , username: String, quantity: Int, zones: String, type:String, validitytime:Timestamp?,  maxnumberOfRides : Int?){
+
+        if (!result) return ;
+
         val purchasedTickets = mutableListOf<TicketPurchasedDTO>()
         val id: Long = userDetailsRepository.findIdByUsername(username)?: throw UserDetailsNotFoundException()
         val user: UserDetails
@@ -94,7 +97,6 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
         }catch (e : Exception){
             throw UserEmpty()
         }
-
 
         repeat(quantity){
             val purchasedTicket = TicketPurchased(
@@ -114,8 +116,6 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
                 createTicketJwt(purchasedTicket.id.toString(), purchasedTicket.issuedAt, purchasedTicket.expiry, purchasedTicket.zoneID, purchasedTicket.type, purchasedTicket.validitytime, purchasedTicket.maxnumberOfRides)
             ))
         }
-
-        return purchasedTickets
     }
 
     override fun getTravelers() : List<UserDetailsDTO>{

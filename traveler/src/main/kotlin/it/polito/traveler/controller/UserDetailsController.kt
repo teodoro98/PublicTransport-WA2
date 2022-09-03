@@ -1,6 +1,6 @@
 package it.polito.traveler.controller
 
-import it.polito.traveler.dto.BuyTickets
+import it.polito.traveler.dto.BuyTicketsDTO
 import it.polito.traveler.dto.TicketPurchasedDTO
 import it.polito.traveler.dto.UserDetailsDTO
 import it.polito.traveler.security.UserDetailsImpl
@@ -72,10 +72,10 @@ class UserDetailsController {
     }
 
 
-
+/*
     @PostMapping("/tickets")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun buyTickets(@RequestBody buyTickets: BuyTickets): List<TicketPurchasedDTO>{
+    fun buyTickets(@RequestBody buyTickets: BuyTicketsDTO): List<TicketPurchasedDTO>{
         if(buyTickets.cmd != "buy_tickets") {
             throw CmdNotValid()
         }
@@ -85,6 +85,8 @@ class UserDetailsController {
         val tickets = travelerService.buyTickets(username, buyTickets.quantity, buyTickets.zones, buyTickets.type, buyTickets.validitytime, buyTickets.maxnumberOfRides)
         return tickets
     }
+
+ */
 
 
 

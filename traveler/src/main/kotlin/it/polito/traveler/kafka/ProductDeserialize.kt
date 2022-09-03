@@ -1,13 +1,14 @@
-package it.polito.ticketcatalogue.kafka
+package it.polito.traveler.kafka
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import it.polito.ticketcatalogue.dto.BuyTicketsDTO
-import it.polito.ticketcatalogue.dto.ResultMessage
-import it.polito.ticketcatalogue.dto.UserOrder
+import it.polito.traveler.dto.BuyTicketsDTO
+import it.polito.traveler.dto.ResultMessage
+import it.polito.traveler.dto.UserOrder
 import org.apache.kafka.common.errors.SerializationException
 import org.apache.kafka.common.serialization.Deserializer
 import org.slf4j.LoggerFactory
 import java.sql.Timestamp
+import kotlin.text.Charsets.UTF_8
 
 
 class ProductDeserializer : Deserializer<ResultMessage> {
@@ -30,7 +31,9 @@ class ProductDeserializer : Deserializer<ResultMessage> {
             val userOrder = UserOrder(id, username, password, authorities)
 
             val orderId : Long = orderNode.get("orderId").asLong()
+
             val result: Boolean = orderNode.get("result").asBoolean()
+
 
             val buyTickets = orderNode.get("buyTickets");
 
@@ -54,6 +57,7 @@ class ProductDeserializer : Deserializer<ResultMessage> {
             val buyTicketss= BuyTicketsDTO(cmd, quantity, zones, type, validitytime, maxnumberOfRides);
 
             val resultDTO = ResultMessage(userOrder, orderId, buyTicketss, result)
+
             return resultDTO
         }
         else

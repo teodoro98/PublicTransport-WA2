@@ -1,21 +1,21 @@
 package it.polito.payment.kafka
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import it.polito.payment.dto.OrderTopic
+import it.polito.payment.dto.BuyTicketsDTO
+import it.polito.payment.dto.OrderMessage
 import it.polito.payment.dto.PaymentInfoDTO
 import it.polito.payment.dto.UserOrder
-import it.polito.payment.security.UserDetailsImpl
 import org.apache.kafka.common.errors.SerializationException
 import org.apache.kafka.common.serialization.Deserializer
 import org.slf4j.LoggerFactory
-import kotlin.text.Charsets.UTF_8
+import java.sql.Timestamp
 
 
-class ProductDeserializer : Deserializer<OrderTopic> {
+class ProductDeserializer : Deserializer<OrderMessage> {
     private val objectMapper = ObjectMapper()
     private val log = LoggerFactory.getLogger(javaClass)
 
-    override fun deserialize(topic: String?, data: ByteArray?): OrderTopic {
+    override fun deserialize(topic: String?, data: ByteArray?): OrderMessage {
         log.info("Deserializing...")
         //if(topic=="product"){
             if(data == null) {
@@ -40,7 +40,28 @@ class ProductDeserializer : Deserializer<OrderTopic> {
             val cardHolder: String = payInfo.get("cardHolder").textValue()
             val paymentInfo = PaymentInfoDTO(creditCardNumber, exp, cvv, cardHolder)
 
-            val res = OrderTopic(userOrder, orderId, price, paymentInfo)
+            val buyTickets = orderNode.get("buyTickets");
+
+            val cmd : String = buyTickets.get("cmd").textValue();
+            val quantity :Int = buyTickets.get("quantity").asInt();
+            val zones : String = buyTickets.get("zones").textValue();
+            var type : String = buyTickets.get("type").textValue();
+
+            var validitytime : Timestamp? = null;
+
+            if (!buyTickets.get("validitytime").isNull){
+                validitytime = Timestamp.valueOf(buyTickets.get("validitytime").textValue());
+            }
+
+            var maxnumberOfRides :Int? = null;
+
+            if (!buyTickets.get("maxnumberOfRides").isNull) {
+            maxnumberOfRides= buyTickets.get("maxnumberOfRides").asInt();
+            }
+
+            val buyTicketss= BuyTicketsDTO(cmd, quantity, zones, type, validitytime, maxnumberOfRides);
+
+            val res = OrderMessage(userOrder, orderId, buyTicketss, price, paymentInfo)
             println("$res")
 
             //val res = objectMapper.readValue(str, OrderTopic::class.java)

@@ -35,6 +35,11 @@ dependencies {
     implementation("org.springframework.security:spring-security-crypto:5.6.3")
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
     implementation("io.jsonwebtoken:jjwt:0.9.1")
+    implementation("org.springframework.kafka:spring-kafka")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+
+    testImplementation("org.springframework.kafka:spring-kafka-test")
+
 }
 
 tasks.withType<KotlinCompile> {

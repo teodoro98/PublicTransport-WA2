@@ -1,4 +1,4 @@
-package it.polito.ticketcatalogue.kafka
+package it.polito.traveler.kafka
 
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -23,8 +23,8 @@ class KafkaConsumerConfig(
     fun consumerFactory(): ConsumerFactory<String?, Any?> {
         val props: MutableMap<String, Any> = HashMap()
         props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = servers
-        props[ConsumerConfig.GROUP_ID_CONFIG] = "ppr"
-        props[ConsumerConfig.CLIENT_ID_CONFIG] = "ticketcatalogue"
+        props[ConsumerConfig.GROUP_ID_CONFIG] = "ppr1"
+        props[ConsumerConfig.CLIENT_ID_CONFIG] = "traveler"
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = ProductDeserializer::class.java
         props[ConsumerConfig.AUTO_OFFSET_RESET_CONFIG] = "earliest"

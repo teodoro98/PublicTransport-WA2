@@ -1,8 +1,7 @@
-package it.polito.ticketcatalogue.kafka
+package it.polito.traveler.kafka
 
-import it.polito.ticketcatalogue.dto.ResultMessage
-import it.polito.ticketcatalogue.security.UserDetailsImpl
-import it.polito.ticketcatalogue.service.TicketCatalogueServiceImpl
+import it.polito.traveler.dto.ResultMessage
+import it.polito.traveler.service.TravelerServiceImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -19,23 +18,24 @@ class Consumer {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
-    private lateinit var ticketCatalogueService: TicketCatalogueServiceImpl
+    private lateinit var travelerService: TravelerServiceImpl
 
-    @KafkaListener(topics = ["\${kafka.topics.result}"], groupId = "ppr")
+    @KafkaListener(topics = ["\${kafka.topics.result}"], groupId = "ppr1")
      fun listenGroupFoo(consumerRecord: ConsumerRecord<Any, Any>, ack: Acknowledgment) {
         logger.info("Message received {}", consumerRecord)
         ack.acknowledge()
 
         val result = consumerRecord.value() as ResultMessage
-        val userDetails = UserDetailsImpl(
-            result.userDetails.id,
-            result.userDetails.username,
-            result.userDetails.password, listOf(
-            SimpleGrantedAuthority(result.userDetails.authorities as String?)
-        ))
+
+        val ticket = result.buyTickets;
+
+        val username = result.userDetails.username
+
+        val res = result.result;
+
         val scope = CoroutineScope(Job())
         scope.launch {
-            ticketCatalogueService.updateOrder(userDetails, result.orderId, result.result)
+            travelerService.buyTickets(res, username, ticket.quantity, ticket.zones, ticket.type, ticket.validitytime, ticket.maxnumberOfRides)
         }
     }
 }

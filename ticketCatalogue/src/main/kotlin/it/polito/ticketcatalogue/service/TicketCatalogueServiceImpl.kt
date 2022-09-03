@@ -1,7 +1,6 @@
 package it.polito.ticketcatalogue.service
 
 import it.polito.ticketcatalogue.controller.InternalServerErrorException
-import it.polito.ticketcatalogue.controller.NoTicketFoundException
 import it.polito.ticketcatalogue.controller.OrderNotFoundException
 import it.polito.ticketcatalogue.controller.TicketNotCompatibleException
 import it.polito.ticketcatalogue.dto.*
@@ -16,7 +15,6 @@ import org.apache.kafka.common.requests.DeleteAclsResponse.log
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.messaging.Message
@@ -56,10 +54,12 @@ class TicketCatalogueServiceImpl(
         val buyerId = userDetails.getId()
 
 
-
+/*
         if(!checkUserTicketCompatible(retrieveUserDetails(userDetails), ticketEntity)) {
             throw TicketNotCompatibleException()
         }
+
+ */
 
         val tot = ticketEntity.price * requestOrder.quantity
         val orderEntity = orderRepository.save(
@@ -74,15 +74,17 @@ class TicketCatalogueServiceImpl(
             )
         )
 
+        val buyTickets= BuyTicketsDTO("buy_tickets", orderEntity.quantity, ticketEntity!!.zone, ticketEntity!!.type, ticketEntity.validitytime, ticketEntity.maxnumber_of_rides  )
+
         val paymentInfo = requestOrder.paymentInfo
 
         val userOrder = UserOrder(userDetails.getId(), userDetails.username, userDetails.password, userDetails.authorities.elementAt(0)!!.authority)
-        val order = OrderTopic(userOrder, orderEntity.id!!, orderEntity.price, paymentInfo)
+        val order = OrderMessage(userOrder, orderEntity.id!!, buyTickets, orderEntity.price, paymentInfo)
 
         try {
             log.info("Receiving product request")
             log.info("Sending message to Kafka {}", order)
-            val message: Message<OrderTopic> = MessageBuilder
+            val message: Message<OrderMessage> = MessageBuilder
                 .withPayload(order)
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .setHeader("X-Custom-Header", "Custom header here")
@@ -158,6 +160,8 @@ class TicketCatalogueServiceImpl(
         }
     }
 
+    /*
+
     private suspend fun retrieveUserDetails(userDetails: UserDetailsImpl): UserDetailsDTO {
         val jwt: String = jwtUtils.generateJwtToken(userDetails)
         val result = WebClient
@@ -172,6 +176,8 @@ class TicketCatalogueServiceImpl(
         return result
     }
 
+     */
+
     override suspend fun updateOrder(userDetails: UserDetailsImpl, orderId: Long, result: Boolean){
         var status = Order.Status.FAILURE
         if(result){
@@ -182,15 +188,15 @@ class TicketCatalogueServiceImpl(
         order.status=status
         orderRepository.save(order)
 
-        val ticket = ticketRepository.findById(order.typeId)
+        //val ticket = ticketRepository.findById(order.typeId)
 
-        val ticketstopurchase = BuyTickets("buy_tickets", order.quantity, ticket!!.zone, ticket!!.type, ticket.validitytime, ticket.maxnumber_of_rides  )
+        //val ticketstopurchase = BuyTicketsDTO("buy_tickets", order.quantity, ticket!!.zone, ticket!!.type, ticket.validitytime, ticket.maxnumber_of_rides  )
 
-        purchaseTicketService(userDetails, ticketstopurchase)
+        //purchaseTicketService(userDetails, ticketstopurchase)
 
     }
 
-    private suspend fun purchaseTicketService(userDetails: UserDetailsImpl, tickets: BuyTickets) {
+    private suspend fun purchaseTicketService(userDetails: UserDetailsImpl, tickets: BuyTicketsDTO) {
         val jwt: String = jwtUtils.generateJwtToken(userDetails)
 
         val result = WebClient
@@ -200,7 +206,7 @@ class TicketCatalogueServiceImpl(
             .accept(MediaType.APPLICATION_JSON)
             .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .header("Authorization", "Bearer $jwt")
-            .body(Mono.just(tickets), BuyTickets::class.java)
+            .body(Mono.just(tickets), BuyTicketsDTO::class.java)
             .retrieve()
             .awaitBody<List<TicketPurchasedDTO>>()
 

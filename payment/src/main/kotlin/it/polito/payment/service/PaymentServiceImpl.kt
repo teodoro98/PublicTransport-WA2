@@ -1,13 +1,9 @@
 package it.polito.payment.service
 
 import it.polito.payment.controller.InternalServerErrorException
-import it.polito.payment.dto.OrderTopic
-import it.polito.payment.dto.ResultDTO
-import it.polito.payment.dto.TransactionDTO
-import it.polito.payment.dto.UserOrder
+import it.polito.payment.dto.*
 import it.polito.payment.entity.Transaction
 import it.polito.payment.repository.TransactionRepository
-import it.polito.payment.security.UserDetailsImpl
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -40,7 +36,7 @@ class PaymentServiceImpl(
         return transactionRepository.findByUserId(userId).map { it.toTransactionDTO() }
     }
 
-    override suspend fun issuePayment(orderTopic: OrderTopic) {
+    override suspend fun issuePayment(orderTopic: OrderMessage) {
         var res: Boolean = true
 
         val exp: String= orderTopic.paymentInfo.exp
@@ -58,15 +54,15 @@ class PaymentServiceImpl(
         }
 
 
-        sendPaymentResult(orderTopic.userDetails, orderTopic.orderId, res)
+        sendPaymentResult(orderTopic.userDetails, orderTopic.orderId, orderTopic.buyTickets, res)
     }
 
-    private suspend fun sendPaymentResult(userDetails: UserOrder, orderId: Long, result: Boolean) {
-        val resultDTO = ResultDTO(userDetails, orderId, result)
+    private suspend fun sendPaymentResult(userDetails: UserOrder, orderId: Long, buyTickets:BuyTicketsDTO, result: Boolean) {
+        val resultDTO = ResultMessage(userDetails, orderId, buyTickets, result)
         try {
             log.info("Receiving payment result")
             log.info("Sending message to Kafka {}", resultDTO)
-            val message: Message<ResultDTO> = MessageBuilder
+            val message: Message<ResultMessage> = MessageBuilder
                 .withPayload(resultDTO)
                 .setHeader(KafkaHeaders.TOPIC, topic)
                 .setHeader("X-Custom-Header", "Custom header here")
