@@ -29,6 +29,9 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
     @Autowired
     private lateinit var ticketPurchasedRepository: TicketPurchasedRepository
 
+    @Value("\${server.ticket.expiration.millisec}")
+    private lateinit var deltaExpirationTicket: String
+
     override fun getProfile(username:String): UserDetailsDTO {
         val id = userDetailsRepository.findIdByUsername(username) ?: throw UserDetailsNotFoundException()
         val user = userDetailsRepository.findById(id!!).get()
@@ -98,11 +101,13 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
             throw UserEmpty()
         }
 
+        val exp: Long = deltaExpirationTicket.toLong() + System.currentTimeMillis()
+
         repeat(quantity){
             val purchasedTicket = TicketPurchased(
                 user,
                 java.sql.Timestamp(System.currentTimeMillis()),
-                java.sql.Timestamp(System.currentTimeMillis() + 3_600 * 1_000),
+                java.sql.Timestamp(exp),
                 zones,
                 type,
                 validitytime,

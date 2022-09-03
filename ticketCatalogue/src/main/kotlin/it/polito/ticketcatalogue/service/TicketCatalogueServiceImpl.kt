@@ -66,7 +66,7 @@ class TicketCatalogueServiceImpl(
             Order(
                 null,
                 requestOrder.quantity,
-                null,
+                ticketEntity,
                 ticketEntity.id!!,
                 tot,
                 Order.Status.PENDING,
@@ -74,7 +74,7 @@ class TicketCatalogueServiceImpl(
             )
         )
 
-        val buyTickets= BuyTicketsDTO("buy_tickets", orderEntity.quantity, ticketEntity!!.zone, ticketEntity!!.type, ticketEntity.validitytime, ticketEntity.maxnumber_of_rides  )
+        val buyTickets= BuyTicketsDTO("buy_tickets", orderEntity.quantity, ticketEntity.zone, ticketEntity.type, ticketEntity.validitytime, ticketEntity.maxnumber_of_rides  )
 
         val paymentInfo = requestOrder.paymentInfo
 
@@ -102,7 +102,7 @@ class TicketCatalogueServiceImpl(
 
     override suspend fun getMyOrders(buyerId: Long): Flow<OrderDTO> {
         return orderRepository.findByBuyerId(buyerId).map {
-            it.type = ticketRepository.findAll().filter { it2 -> it2.id==it.typeId }.single()
+            it.ticket = ticketRepository.findAll().filter { it2 -> it2.id==it.ticketId }.single()
             it
          }.map { it.toOrderDTO() }
     }
@@ -111,7 +111,7 @@ class TicketCatalogueServiceImpl(
         val order = orderRepository.findById(orderID)
             ?:
             throw OrderNotFoundException()
-        order.type = ticketRepository.findAll().filter { it.id==order.typeId }.single()
+        order.ticket = ticketRepository.findAll().filter { it.id==order.ticketId }.single()
         return order.toOrderDTO()
 
     }
@@ -134,7 +134,7 @@ class TicketCatalogueServiceImpl(
 
     override suspend fun getAllOrders(): Flow<OrderDTO> {
         return orderRepository.findAll().map {
-            it.type = ticketRepository.findAll().filter { it2 -> it2.id==it.typeId }.single()
+            it.ticket = ticketRepository.findAll().filter { it2 -> it2.id==it.ticketId }.single()
             it
         }.map { it.toOrderDTO() }
     }

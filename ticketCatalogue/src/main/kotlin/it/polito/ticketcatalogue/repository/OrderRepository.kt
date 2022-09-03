@@ -17,9 +17,9 @@ interface OrderRepository: CoroutineCrudRepository<Order, Long> {
     fun findByBuyerId(@Param("buyerId")buyerId : Long): Flow<Order>
 
 
-    @Query("SELECT * FROM order_order, ticket WHERE order_order.type_id = ticket.id AND order_order.id=:orderID")
+    @Query("SELECT * FROM order_order, ticket WHERE order_order.ticket_id = ticket.id AND order_order.id=:orderID")
     suspend fun findOrderById(@Param("orderID")orderID : Long): Order
 
-    @Query("SELECT * FROM order_order, ticket WHERE order_order.type_id = ticket.id")
+    @Query("SELECT * FROM order_order, ticket WHERE order_order.ticket_id = ticket.id")
     fun findAllOrders(): Flow<Order>
 }

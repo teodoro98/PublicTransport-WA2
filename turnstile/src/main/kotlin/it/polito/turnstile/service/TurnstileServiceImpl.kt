@@ -14,34 +14,38 @@ import org.springframework.stereotype.Service
 import java.sql.Time
 import java.sql.Timestamp
 import java.time.LocalDateTime
+import java.util.*
 
 @Service
-class TurnstileServiceImpl(): TurnstileService  {
+class TurnstileServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: String): TurnstileService  {
 
-    @Value("\${server.login.token.secret}")
-    private var jwtSecret: String = ""
+    private val jwtSecret: String = Base64.getEncoder().encodeToString(clearSecret.toByteArray())
 
     @Autowired
     private lateinit var transitRepository :  TransitRepository
 
-    override suspend fun checkTicket(jwt: String): Boolean{
+    @Autowired
+    private lateinit var turnstileDetailsRepository :  TurnstileDetailsRepository
+
+    override suspend fun checkTicket(jwt: String, turnstileUsername: String): Boolean{
 
 
-        val ticketId = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["id"] as Long
-        val iatString = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["iat"]
-        val iat = Timestamp.valueOf(iatString as String);
+        val ticketId = (Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["sub"] as String).toLong()
+        val user = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["username"] as String
+        /*val iatString = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["iat"]
+        val iat = Timestamp((iatString as String).toLong())
 
         val expString  = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["exp"]
-        val exp = Timestamp.valueOf(expString as String);
-
+        val exp = Timestamp.valueOf(expString as String)
+        */
 
         val zid  = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["zid"] as String
 
         val type = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["type"] as String
         //TYPE travelcard, carnet
 
-        val validitytimeString = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["validitytime"]
-        val validitytime = Timestamp.valueOf(validitytimeString as String);
+        val validitytimeString = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["validitytime"] as Long
+        val validitytime = Timestamp(validitytimeString)
 
 
         val maxnumberOfRides = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["maxnumberOfRides"] as Int
@@ -66,19 +70,17 @@ class TurnstileServiceImpl(): TurnstileService  {
         val maxnumberOfRides = 10;
 */
 
-        val turnstileId = 0L
-        val turnstileZid = "A";
 
 
         var check = false
         val now = LocalDateTime.now();
 
-        if (Timestamp.valueOf(now).after(exp) && (zid).contains(turnstileZid) ){
+        if ((zid).contains(this.getTurnstileDetails(turnstileUsername).zoneId) ){
 
             when(type) {
 
                 "travelcard" -> {
-
+                    //TODO: Not ticketID, ask Teo
                     val firstTimeTicket : Timestamp = Timestamp.valueOf(transitRepository.findFirst(ticketId).date); //call db
                     val effectiveEnd = Timestamp(validitytime.time + firstTimeTicket.time)
                     if (Timestamp.valueOf(now).after(effectiveEnd)) {
@@ -108,8 +110,29 @@ class TurnstileServiceImpl(): TurnstileService  {
         return check
     }
 
-    override suspend fun getTransits(): Flow<TransitDTO> {
-        return transitRepository.findAll().map { it.toDTO() }
+    override suspend fun getTransits(since: LocalDateTime?, to: LocalDateTime?, username: String? ): Flow<TransitDTO> {
+        if(since == null && to != null) {
+            // Only end
+            //TODO
+            return transitRepository.findAll().map { it.toDTO() }
+        } else if(since != null && to == null){
+            // Only beginning
+            //TODO
+            return transitRepository.findAll().map { it.toDTO() }
+        } else if(since != null && to != null){
+            // Both beginnig and end
+            //TODO
+            return if(username != null) {
+                transitRepository.findUserTransits(username, since, to).map { t -> t.toDTO() }
+            } else {
+                //TODO
+                transitRepository.findAll().map { it.toDTO() }
+            }
+        } else {
+            // No period time
+            //TODO
+            return transitRepository.findAll().map { it.toDTO() }
+       }
     }
 
     override suspend fun getSecret(): String{

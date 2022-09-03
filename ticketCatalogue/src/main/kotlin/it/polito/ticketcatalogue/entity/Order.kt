@@ -15,9 +15,9 @@ class Order(
     var quantity: Int,
 
     @Transient
-    var type: Ticket?,
+    var ticket: Ticket?,
 
-    var typeId: Long,
+    var ticketId: Long,
 
     var price: Double,
 
@@ -32,18 +32,18 @@ class Order(
 
         quantity: Int,
 
-        typeId: Long,
+        ticketId: Long,
 
         price: Double,
 
         status: Status,
 
         buyerId: Long
-    ) : this(id, quantity, null, typeId, price, status, buyerId)
+    ) : this(id, quantity, null, ticketId, price, status, buyerId)
 
 
     fun toOrderDTO(): OrderDTO {
-        return OrderDTO(id, quantity, type!!.type,price,status.toString(),buyerId)
+        return OrderDTO(id, quantity, ticket!!.toTicketDTO(),price,status.toString(),buyerId)
     }
 
     enum class Status {

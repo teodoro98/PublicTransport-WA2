@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface TurnstileService{
 
-    suspend fun checkTicket(qrcode: String): Boolean
+    suspend fun checkTicket(qrcode: String, turnstileUsername: String): Boolean
 
-    suspend fun getTransits(): Flow<TransitDTO>
+    suspend fun getTransits(since: LocalDateTime?, to: LocalDateTime?, username: String?): Flow<TransitDTO>
 
     suspend fun getSecret(): String
 }
