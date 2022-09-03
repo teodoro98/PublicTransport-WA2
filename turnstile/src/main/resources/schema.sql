@@ -9,8 +9,9 @@ CREATE TABLE IF NOT EXISTS turnstile_details
 CREATE TABLE IF NOT EXISTS transit
 (
     id BIGSERIAL NOT NULL,
-    turnstileid BIGSERIAL NOT NULL,
-    ticktid BIGSERIAL NOT NULL,
-    validationDate TIMESTAMP NOT NULL,
+    turnstile_username TEXT NOT NULL,
+    username TEXT NOT NULL,
+    ticket_id BIGSERIAL NOT NULL,
+    validation_date TIMESTAMP NOT NULL,
     CONSTRAINT pk_transit_id PRIMARY KEY(id)
 );

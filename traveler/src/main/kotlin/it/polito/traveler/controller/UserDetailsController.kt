@@ -63,20 +63,13 @@ class UserDetailsController {
 
     @GetMapping("/ticket/{ticket-id}/qrcode")
     @ResponseStatus(HttpStatus.FOUND)
-    fun getQr(@PathVariable(value="user-id") ticketId: Long): ByteArrayResource{
+    fun getQr(@PathVariable(value="ticket-id") ticketId: Long): ByteArrayResource{
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
         val username = userDetails.username
-        val jws= travelerService.getTicket(ticketId).jws
 
-
-        val imageOut = ByteArrayOutputStream()
-        QRCode(jws).render().writeImage(imageOut)
-
-        val imageBytes = imageOut.toByteArray()
-        val resource = ByteArrayResource(imageBytes, IMAGE_PNG_VALUE)
-
-        return resource;
+        val qr= travelerService.getQr(ticketId, username)
+        return qr;
     }
 
 

@@ -1,5 +1,6 @@
 package it.polito.traveler.service
 
+import io.github.g0dkar.qrcode.QRCode
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import it.polito.traveler.controller.UserDetailsNotFoundException
@@ -14,6 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.http.MediaType
+import java.io.ByteArrayOutputStream
+
 import java.time.LocalDate
 import java.util.*
 import javax.crypto.KeyGenerator
@@ -78,6 +83,7 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
         return listTickets
     }
 
+
     override fun getTicket(ticketId: Long): TicketPurchasedDTO {
 
         val t = ticketPurchasedRepository.findById(ticketId).get();
@@ -87,6 +93,23 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
         return ticket;
 
     }
+
+    override fun getQr(ticketId: Long, username: String): ByteArrayResource{
+
+
+        val t = ticketPurchasedRepository.findById(ticketId).get();
+        val jws= createqrJwt(username, t.id.toString(), t.issuedAt, t.expiry, t.zoneID, t.type, t.validitytime, t.maxnumberOfRides)
+
+        val imageOut = ByteArrayOutputStream()
+        QRCode(jws).render().writeImage(imageOut)
+
+        val imageBytes = imageOut.toByteArray()
+        val resource = ByteArrayResource(imageBytes, MediaType.IMAGE_PNG_VALUE)
+
+        return resource;
+
+    }
+
 
     override fun buyTickets(result:Boolean , username: String, quantity: Int, zones: String, type:String, validitytime:Timestamp?,  maxnumberOfRides : Int?){
 
@@ -143,6 +166,22 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
             .claim("type", type)
             .claim("validitytime", validitytime)
             .claim("maxnumberOfRides", maxnumberOfRides)
+            .compact()
+        return jws
+    }
+
+    private fun createqrJwt(username:String, sub: String, iat: Timestamp, exp: Timestamp, zid: String, type: String, validitytime : Timestamp?, maxnumberOfRides : Int? ) : String {
+        val encodedSecret: String = Base64.getEncoder().encodeToString(ticketSecret.toByteArray())
+        val jws: String = Jwts.builder() // (1)
+            .setSubject(sub) // (2)
+            .signWith(SignatureAlgorithm.HS256, encodedSecret) // (3)
+            .setIssuedAt(Date(iat.time))
+            .setExpiration(Date(exp.time))
+            .claim("zid", zid)
+            .claim("type", type)
+            .claim("validitytime", validitytime)
+            .claim("maxnumberOfRides", maxnumberOfRides)
+            .claim("username", username)
             .compact()
         return jws
     }

@@ -2,8 +2,11 @@ package it.polito.turnstile.service
 
 import io.jsonwebtoken.Jwts
 import it.polito.turnstile.dto.TransitDTO
+import it.polito.turnstile.dto.TurnstileDetailsDTO
 import it.polito.turnstile.entity.Transit
+import it.polito.turnstile.entity.TurnstileDetatils
 import it.polito.turnstile.repository.TransitRepository
+import it.polito.turnstile.repository.TurnstileDetailsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.beans.factory.annotation.Autowired
@@ -101,7 +104,7 @@ class TurnstileServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret:
             }
             if (check){
                 //Insert transit
-                val transit = Transit(null, turnstileId, ticketId, now)
+                val transit = Transit(null, ticketId, user, turnstileUsername, now)
                 transitRepository.save(transit)
             }
 
@@ -137,6 +140,28 @@ class TurnstileServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret:
 
     override suspend fun getSecret(): String{
         return jwtSecret
+    }
+
+    override suspend fun addDetails(detailsDTO: TurnstileDetailsDTO) {
+
+        val turnstileDetails = TurnstileDetatils(null, detailsDTO.username, detailsDTO.zoneId )
+        turnstileDetailsRepository.save(turnstileDetails);
+
+    }
+
+    override suspend fun getTurnstileDetails(turnstileUsername : String) : TurnstileDetailsDTO {
+
+        val turnstileId= turnstileDetailsRepository.findIdByUsername(turnstileUsername)
+
+        if(turnstileId != null) {
+            val turnstileDetails = turnstileDetailsRepository.findById(turnstileId)?.toDTO()
+
+            return turnstileDetails!!;
+        }else {
+            //TODO: TurnstileNotFound exception
+            throw Exception("TurnstileNotFound")
+        }
+
     }
 
 

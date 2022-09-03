@@ -50,7 +50,8 @@ class ProductDeserializer : Deserializer<OrderMessage> {
             var validitytime : Timestamp? = null;
 
             if (!buyTickets.get("validitytime").isNull){
-                validitytime = Timestamp.valueOf(buyTickets.get("validitytime").textValue());
+                val timeLong= buyTickets.get("validitytime").asLong()
+                validitytime = Timestamp(timeLong);
             }
 
             var maxnumberOfRides :Int? = null;

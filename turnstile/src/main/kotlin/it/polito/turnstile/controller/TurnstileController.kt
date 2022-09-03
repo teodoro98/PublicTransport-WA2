@@ -29,7 +29,7 @@ class TurnstileController {
         return turnstileService.getSecret()
     }
 
-    @GetMapping("turnstile/details")
+    @GetMapping("turnstile/details/{turnstileUsername}")
     @ResponseStatus(HttpStatus.FOUND)
     @PreAuthorize("hasRole('ADMIN')")
     suspend fun getTurnstileDetails(@PathVariable("turnstileUsername") turnstileUsername: String): TurnstileDetailsDTO {
