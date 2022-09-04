@@ -12,12 +12,12 @@ class Transit(
     var ticketId: Long = 0,
     val username: String = "",
     var turnstileUsername: String = "",
-    var date: LocalDateTime= LocalDateTime.now()
+    var validation_date: LocalDateTime= LocalDateTime.now()
 ){
 
 
     fun toDTO(): TransitDTO {
-        return TransitDTO(id, ticketId, username, turnstileUsername, date)
+        return TransitDTO(id, ticketId, username, turnstileUsername, validation_date)
     }
 
 

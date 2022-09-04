@@ -13,14 +13,14 @@ import java.time.LocalDateTime
 interface TransitRepository: CoroutineCrudRepository<Transit, Long> {
 
     @Transactional
-    @Query("select from transit t where t.ticketId=:ticketId order by date asc")
-    suspend fun findFirst(@Param("ticketId")ticketId: Long): Transit
+    @Query("select from transit t where t.ticket_id=:ticketId order by validation_date")
+    suspend fun findFirst(@Param("ticketId")ticketId: Long): Transit?
 
     @Transactional
-    @Query("select count(*) from transit t where t.ticketId=:ticketId")
+    @Query("select count(*) from transit t where t.ticket_id=:ticketId")
     suspend fun countRide(@Param("ticketId")ticketId: Long): Int
 
     @Transactional
-    @Query("select from transit t where t.username=:username and t.date>=:since and t.date<=:to")
+    @Query("select from transit t where t.username=:username and t.validation_date>=:since and t.validation_date<=:to")
     suspend fun findUserTransits(@Param("username")username: String, @Param("since")since: LocalDateTime, @Param("to")to: LocalDateTime): Flow<Transit>
 }

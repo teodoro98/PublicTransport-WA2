@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 
 interface TurnstileService{
 
-    suspend fun checkTicket(qrcode: String, turnstileUsername: String): Boolean
+    suspend fun checkTicket(jwt: String, turnstileUsername: String)
 
     suspend fun getTransits(since: LocalDateTime?, to: LocalDateTime?, username: String?): Flow<TransitDTO>
 

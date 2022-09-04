@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
-import java.sql.Timestamp
 import java.time.LocalDateTime
 
 
@@ -45,8 +44,8 @@ class TurnstileController {
 
     @PostMapping("turnstile/checkTicket")
     @PreAuthorize("hasRole('TURNSTILE')")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    suspend fun checkTicket(@RequestBody qrCode: QRCode, principal: Principal): Boolean{
+    @ResponseStatus(HttpStatus.OK)
+    suspend fun checkTicket(@RequestBody qrCode: QRCode, principal: Principal){
         val userDetails: UserDetailsImpl = (principal as UsernamePasswordAuthenticationToken).principal as UserDetailsImpl
         return turnstileService.checkTicket(qrCode.jwt, userDetails.username)
     }

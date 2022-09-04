@@ -11,10 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
-import java.sql.Time
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.util.*
@@ -30,7 +27,7 @@ class TurnstileServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret:
     @Autowired
     private lateinit var turnstileDetailsRepository :  TurnstileDetailsRepository
 
-    override suspend fun checkTicket(jwt: String, turnstileUsername: String): Boolean{
+    override suspend fun checkTicket(jwt: String, turnstileUsername: String){
 
 
         val ticketId = (Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(jwt).body["sub"] as String).toLong()
@@ -76,64 +73,72 @@ class TurnstileServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret:
 
 
         var check = false
-        val now = LocalDateTime.now();
+        val now = LocalDateTime.now()
 
         if ((zid).contains(this.getTurnstileDetails(turnstileUsername).zoneId) ){
 
             when(type) {
-
                 "travelcard" -> {
                     //TODO: Not ticketID, ask Teo
-                    val firstTimeTicket : Timestamp = Timestamp.valueOf(transitRepository.findFirst(ticketId).date); //call db
-                    val effectiveEnd = Timestamp(validitytime.time + firstTimeTicket.time)
-                    if (Timestamp.valueOf(now).after(effectiveEnd)) {
-                        check=true;
+                    val firstTransit = transitRepository.findFirst(ticketId)
+                    if(firstTransit != null) {
+                        // A first transit exists
+                        val firstTimeTicket : Timestamp = Timestamp.valueOf(firstTransit.validation_date)
+                        // Get effective end of the validity period of time starting from FIRST transit
+                        val effectiveEnd = Timestamp(validitytime.time + firstTimeTicket.time)
+                        if (Timestamp.valueOf(now).after(effectiveEnd)) {
+                            // The end is after today
+                            check=true
+                        }
+                    } else {
+                        check = true
                     }
-
                 }
-
                 "carnet" -> {
-
                     val numberOfRides = transitRepository.countRide(ticketId)
                     if (maxnumberOfRides>numberOfRides){
-                        check=true;
+                        check=true
                     }
-
                 }
-
+                else -> {
+                    // Type not found
+                    // TODO TypeNotFoundException
+                    throw Exception("Type not found exception")
+                }
             }
             if (check){
                 //Insert transit
                 val transit = Transit(null, ticketId, user, turnstileUsername, now)
                 transitRepository.save(transit)
             }
-
         }
-
-        return check
+        // TODO TicketNotValidException
+        if(!check) throw Exception("Ticket not valid")
     }
 
     override suspend fun getTransits(since: LocalDateTime?, to: LocalDateTime?, username: String? ): Flow<TransitDTO> {
         if(since == null && to != null) {
             // Only end
-            //TODO
+            //TODO Query find only end for single username
+            //TODO Query find only end FOR ALL USERNAMES
             return transitRepository.findAll().map { it.toDTO() }
         } else if(since != null && to == null){
             // Only beginning
-            //TODO
+            //TODO Query find only beginning for single username
+            //TODO Query find only beginning FOR ALL USERNAMES
             return transitRepository.findAll().map { it.toDTO() }
         } else if(since != null && to != null){
             // Both beginnig and end
-            //TODO
             return if(username != null) {
                 transitRepository.findUserTransits(username, since, to).map { t -> t.toDTO() }
             } else {
-                //TODO
+                //TODO Query find in period time FOR ALL USERNAMES
                 transitRepository.findAll().map { it.toDTO() }
             }
         } else {
             // No period time
-            //TODO
+            //TODO Query get all for single username
+            //TODO Query get all FOR ALL USERNAMES
             return transitRepository.findAll().map { it.toDTO() }
        }
     }
@@ -145,7 +150,7 @@ class TurnstileServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret:
     override suspend fun addDetails(detailsDTO: TurnstileDetailsDTO) {
 
         val turnstileDetails = TurnstileDetatils(null, detailsDTO.username, detailsDTO.zoneId )
-        turnstileDetailsRepository.save(turnstileDetails);
+        turnstileDetailsRepository.save(turnstileDetails)
 
     }
 
@@ -156,7 +161,7 @@ class TurnstileServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret:
         if(turnstileId != null) {
             val turnstileDetails = turnstileDetailsRepository.findById(turnstileId)?.toDTO()
 
-            return turnstileDetails!!;
+            return turnstileDetails!!
         }else {
             //TODO: TurnstileNotFound exception
             throw Exception("TurnstileNotFound")
