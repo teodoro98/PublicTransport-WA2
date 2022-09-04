@@ -24,13 +24,13 @@ class TurnstileController {
 
     @GetMapping("turnstile/se")
     @PreAuthorize("hasRole('TURNSTILE')")
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     suspend fun getSecret(): String{
         return turnstileService.getSecret()
     }
 
     @GetMapping("turnstile/details/{turnstileUsername}")
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
     suspend fun getTurnstileDetails(@PathVariable("turnstileUsername") turnstileUsername: String): TurnstileDetailsDTO {
         return turnstileService.getTurnstileDetails(turnstileUsername)
@@ -74,7 +74,7 @@ class TurnstileController {
 
     @GetMapping("admin/transits/{username}")
     @PreAuthorize("hasRole('ADMIN')")
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     suspend fun getTransits(@PathVariable("username") username: String,
                             @RequestParam(required = false)
                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)

@@ -1,6 +1,7 @@
 package it.polito.turnstile.service
 
 import io.jsonwebtoken.Jwts
+import it.polito.turnstile.controller.*
 import it.polito.turnstile.dto.TransitDTO
 import it.polito.turnstile.dto.TurnstileDetailsDTO
 import it.polito.turnstile.entity.Transit
@@ -68,16 +69,13 @@ class TurnstileServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret:
                 }
                 else -> {
                     // Type not found
-                    // TODO TypeNotFoundException
-                    throw Exception("Type not found exception")
+                    throw TypeNotFoundException()
                 }
             }
             //Insert transit
             val transit = Transit(null, ticketId, user, turnstileUsername, now)
             transitRepository.save(transit)
         }
-        // TODO TicketNotValidException
-        if(!check) throw Exception("Ticket not valid")
     }
 
     override suspend fun getTransits(since: LocalDateTime?, to: LocalDateTime?, username: String? ): Flow<TransitDTO> {
@@ -137,8 +135,8 @@ class TurnstileServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret:
 
             return turnstileDetails!!
         }else {
-            //TODO: TurnstileNotFound exception
-            throw Exception("TurnstileNotFound")
+
+            throw TurnstileNotFoundException()
         }
 
     }
