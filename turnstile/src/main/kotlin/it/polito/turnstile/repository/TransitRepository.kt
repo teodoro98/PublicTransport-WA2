@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 interface TransitRepository: CoroutineCrudRepository<Transit, Long> {
 
     @Transactional
-    @Query("select from transit t where t.ticket_id=:ticketId order by validation_date")
+    @Query("select * from transit t where t.ticket_id=:ticketId order by validation_date")
     suspend fun findFirst(@Param("ticketId")ticketId: Long): Transit?
 
     @Transactional
@@ -21,6 +21,37 @@ interface TransitRepository: CoroutineCrudRepository<Transit, Long> {
     suspend fun countRide(@Param("ticketId")ticketId: Long): Int
 
     @Transactional
-    @Query("select from transit t where t.username=:username and t.validation_date>=:since and t.validation_date<=:to")
+    @Query("select * from transit t where t.username=:username and t.validation_date>=:since and t.validation_date<=:to")
     suspend fun findUserTransits(@Param("username")username: String, @Param("since")since: LocalDateTime, @Param("to")to: LocalDateTime): Flow<Transit>
+
+    @Transactional
+    @Query("select * from transit t where t.username=:username")
+    suspend fun findUserTransits(@Param("username")username: String): Flow<Transit>
+
+    @Transactional
+    @Query("select * from transit t where t.username=:username and t.validation_date>=:since")
+    suspend fun findUserTransitsSince(@Param("username")username: String, @Param("since")since: LocalDateTime): Flow<Transit>
+
+    @Transactional
+    @Query("select * from transit t where t.username=:username and t.validation_date<=:to")
+    suspend fun findUserTransitsTo(@Param("username")username: String, @Param("to")to: LocalDateTime): Flow<Transit>
+
+    @Transactional
+    @Query("select * from transit t where t.validation_date>=:since and t.validation_date<=:to")
+    suspend fun findCompanyTransits(@Param("since")since: LocalDateTime, @Param("to")to: LocalDateTime): Flow<Transit>
+
+    @Transactional
+    @Query("select * from transit t where t.validation_date>=:since")
+    suspend fun findCompanyTransitsSince(@Param("since")since: LocalDateTime): Flow<Transit>
+
+    @Transactional
+    @Query("select * from transit t where  t.validation_date<=:to")
+    suspend fun findCompanyTransitsTo(@Param("to")to: LocalDateTime): Flow<Transit>
+
+
+    @Transactional
+    @Query("select * from transit t")
+    suspend fun findCompanyTransits(): Flow<Transit>
+
+
 }

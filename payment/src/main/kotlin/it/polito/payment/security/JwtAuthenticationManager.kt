@@ -17,7 +17,7 @@ class JwtAuthenticationManager() : ReactiveAuthenticationManager {
 
     override fun authenticate(authentication: Authentication): Mono<Authentication> {
         return Mono.just(authentication)
-            .filter { jwtUtils.validateJwtToken(it.credentials as String) }
+            .doOnNext { jwtUtils.validateJwtToken(it.credentials as String) }
             .map { jwtUtils.getUserFromJwtToken(it.credentials as String) }
             .map { UsernamePasswordAuthenticationToken(it, null, it.authorities) }
     }

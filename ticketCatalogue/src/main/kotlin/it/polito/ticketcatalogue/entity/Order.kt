@@ -6,7 +6,6 @@ import org.springframework.data.annotation.PersistenceConstructor
 import org.springframework.data.annotation.Transient
 import org.springframework.data.relational.core.mapping.Table
 
-// TODO aggiungere lista di ticket acquistati
 @Table(name = "order_order")
 class Order(
     @Id

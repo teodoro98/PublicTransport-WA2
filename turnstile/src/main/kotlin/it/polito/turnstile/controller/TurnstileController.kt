@@ -7,6 +7,7 @@ import it.polito.turnstile.security.UserDetailsImpl
 import it.polito.turnstile.service.TurnstileService
 import kotlinx.coroutines.flow.Flow
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -35,7 +36,15 @@ class TurnstileController {
         return turnstileService.getTurnstileDetails(turnstileUsername)
     }
 
-    @PostMapping("turnstile/details/")
+    @GetMapping("turnstile/details")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('TURNSTILE')")
+    suspend fun getTurnstileDetails(principal: Principal): TurnstileDetailsDTO {
+        val userDetails: UserDetailsImpl = (principal as UsernamePasswordAuthenticationToken).principal as UserDetailsImpl
+        return turnstileService.getTurnstileDetails(userDetails.username)
+    }
+
+    @PostMapping("turnstile/details")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")
     suspend fun addDetails(@RequestBody details: TurnstileDetailsDTO) {
@@ -52,9 +61,13 @@ class TurnstileController {
 
     @GetMapping("admin/transits")
     @PreAuthorize("hasRole('ADMIN')")
-    @ResponseStatus(HttpStatus.FOUND)
-    suspend fun getTransits(@RequestParam(required = false) since: LocalDateTime?,
-                            @RequestParam(required = false) to: LocalDateTime?
+    @ResponseStatus(HttpStatus.OK)
+    suspend fun getTransits(@RequestParam(required = false)
+                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                            since: LocalDateTime?,
+                            @RequestParam(required = false)
+                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                            to: LocalDateTime?
     ): Flow<TransitDTO> {
         return turnstileService.getTransits(since, to, null)
     }
@@ -63,8 +76,12 @@ class TurnstileController {
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.FOUND)
     suspend fun getTransits(@PathVariable("username") username: String,
-                            @RequestParam(required = false) since: LocalDateTime?,
-                            @RequestParam(required = false) to: LocalDateTime?
+                            @RequestParam(required = false)
+                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                            since: LocalDateTime?,
+                            @RequestParam(required = false)
+                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                            to: LocalDateTime?
     ): Flow<TransitDTO> {
         return turnstileService.getTransits(since, to, username)
     }

@@ -72,7 +72,6 @@ class IntegrationTests {
         val updatedUserDetails = UserDetails("Franco", "Franconi", LocalDate.now(), 3452432432)
         userDetailsRepository.save(userDetails)
 
-        //TODO id deve essere preso dalla security
         val idLong = userDetailsRepository.findIdByUsername("Mario")!!
         val id = HttpEntity(idLong)
 
@@ -110,7 +109,6 @@ class IntegrationTests {
         )
         Assertions.assertEquals(responseGetTickets.statusCode, HttpStatus.FOUND)
 
-        // TODO bisogna passare un payload con {cmd: "buy_tickets", quantity: 2, zones: "ABC"}
         var responsePostTickets = restTemplate.postForEntity<Unit>(
             "$baseUrl/my/tickets",
             id

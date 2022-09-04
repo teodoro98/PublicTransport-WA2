@@ -38,22 +38,25 @@ class JwtUtils {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject()
     }
 
-    fun validateJwtToken(authToken: String?): Boolean {
+    fun validateJwtToken(authToken: String?) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken)
-            return true
         } catch (e: io.jsonwebtoken.SignatureException) {
             logger.error("Invalid JWT signature: {}", e.message)
+            throw e
         } catch (e: MalformedJwtException) {
             logger.error("Invalid JWT token: {}", e.message)
+            throw e
         } catch (e: ExpiredJwtException) {
             logger.error("JWT token is expired: {}", e.message)
+            throw e
         } catch (e: UnsupportedJwtException) {
             logger.error("JWT token is unsupported: {}", e.message)
+            throw e
         } catch (e: IllegalArgumentException) {
             logger.error("JWT claims string is empty: {}", e.message)
+            throw e
         }
-        return false
     }
 
     fun getUserFromJwtToken(jwt: String): UserDetailsImpl {
