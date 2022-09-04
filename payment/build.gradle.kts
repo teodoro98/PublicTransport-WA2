@@ -30,7 +30,7 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-sleuth")
     implementation("org.springframework.kafka:spring-kafka")
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
-    implementation("org.springframework.security:spring-security-crypto:5.6.3")
+    implementation("org.springframework.security:spring-security-crypto")
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
     implementation("io.jsonwebtoken:jjwt:0.9.1")
     // https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
@@ -39,6 +39,12 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.kafka:spring-kafka-test")
     testImplementation("org.springframework.security:spring-security-test")
+
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-webflux-core
+    implementation("org.springdoc:springdoc-openapi-webflux-core:1.6.11")
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-webflux-ui
+    implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.11")
+
 }
 
 dependencyManagement {

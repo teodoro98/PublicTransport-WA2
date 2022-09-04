@@ -17,23 +17,23 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa:2.6.7")
-    implementation("org.postgresql:postgresql:42.3.4")
-    implementation("org.springframework.boot:spring-boot-starter-mail:2.6.7")
-    implementation("org.springframework.boot:spring-boot-starter-web:2.6.7")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.postgresql:postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-mail:2.7.3")
+    implementation("org.springframework.boot:spring-boot-starter-web:2.7.3")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("commons-validator:commons-validator:1.7")
     implementation("io.github.g0dkar:qrcode-kotlin-jvm:3.2.0")
     // https://mvnrepository.com/artifact/com.github.vladimir-bukhtoyarov/bucket4j-core
-    implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.4.0")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:2.6.7")
-    testImplementation ("org.testcontainers:junit-jupiter:1.17.1")
-    testImplementation("org.testcontainers:postgresql:1.17.1")
+    implementation("com.github.vladimir-bukhtoyarov:bucket4j-core:7.6.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:2.7.3")
+    testImplementation ("org.testcontainers:junit-jupiter:1.17.3")
+    testImplementation("org.testcontainers:postgresql:1.17.3")
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
-    implementation("org.springframework.security:spring-security-crypto:5.6.3")
+    implementation("org.springframework.security:spring-security-crypto")
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
     implementation("io.jsonwebtoken:jjwt:0.9.1")
     implementation("org.springframework.kafka:spring-kafka")
@@ -41,6 +41,8 @@ dependencies {
 
     testImplementation("org.springframework.kafka:spring-kafka-test")
 
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.11")
 }
 
 tasks.withType<KotlinCompile> {

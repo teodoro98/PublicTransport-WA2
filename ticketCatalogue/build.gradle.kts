@@ -35,11 +35,16 @@ dependencies {
     // https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
     implementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
     // https://mvnrepository.com/artifact/org.springframework.security/spring-security-crypto
-    implementation("org.springframework.security:spring-security-crypto:5.6.3")
+    implementation("org.springframework.security:spring-security-crypto")
     // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
     implementation("io.jsonwebtoken:jjwt:0.9.1")
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compileOnly("org.projectlombok:lombok:1.18.24")
+
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-webflux-core
+    implementation("org.springdoc:springdoc-openapi-webflux-core:1.6.11")
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-webflux-ui
+    implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.11")
 }
 
 
