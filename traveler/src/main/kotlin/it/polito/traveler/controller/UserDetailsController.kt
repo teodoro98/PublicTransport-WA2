@@ -4,6 +4,7 @@ import io.github.g0dkar.qrcode.QRCode
 import it.polito.traveler.dto.BuyTicketsDTO
 import it.polito.traveler.dto.TicketPurchasedDTO
 import it.polito.traveler.dto.UserDetailsDTO
+import it.polito.traveler.dto.UserDetailsLiteDTO
 import it.polito.traveler.security.UserDetailsImpl
 import it.polito.traveler.service.TravelerServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,7 +36,7 @@ class UserDetailsController {
 
     @PostMapping("/profile")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun createProfile(@RequestBody user: UserDetailsDTO){
+    fun createProfile(@RequestBody user: UserDetailsLiteDTO){
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
         val username = userDetails.username
@@ -45,7 +46,7 @@ class UserDetailsController {
 
     @PutMapping("/profile")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    fun updateProfile(@RequestBody user : UserDetailsDTO){
+    fun updateProfile(@RequestBody user : UserDetailsLiteDTO){
         val userDetails: UserDetailsImpl =
             SecurityContextHolder.getContext().getAuthentication().getPrincipal() as UserDetailsImpl
         val username = userDetails.username

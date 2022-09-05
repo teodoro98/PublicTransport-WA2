@@ -14,7 +14,7 @@ class UserDetails (
     @Column(updatable = true, nullable = false, )
     var dateOfBirth: LocalDate,
     @Column(updatable = true, nullable = false, )
-    var telephoneNumber: Long,
+    var telephoneNumber: String,
         ) {
 
     @Id

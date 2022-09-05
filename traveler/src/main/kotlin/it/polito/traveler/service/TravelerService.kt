@@ -2,6 +2,7 @@ package it.polito.traveler.service
 
 import it.polito.traveler.dto.TicketPurchasedDTO
 import it.polito.traveler.dto.UserDetailsDTO
+import it.polito.traveler.dto.UserDetailsLiteDTO
 import it.polito.traveler.entity.TicketPurchased
 import java.sql.Timestamp
 import org.springframework.core.io.ByteArrayResource
@@ -11,9 +12,9 @@ interface TravelerService {
 
     fun getProfile( username:String ): UserDetailsDTO
 
-    fun createProfile(userDetailsDTO: UserDetailsDTO, username : String)
+    fun createProfile(userDetailsDTO: UserDetailsLiteDTO, username : String)
 
-    fun updateProfile(userDetailsDTO: UserDetailsDTO, username: String)
+    fun updateProfile(userDetailsDTO: UserDetailsLiteDTO, username: String)
 
     fun getTickets(username : String) : List<TicketPurchasedDTO>
 

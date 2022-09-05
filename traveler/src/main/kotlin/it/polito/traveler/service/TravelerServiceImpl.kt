@@ -7,6 +7,7 @@ import it.polito.traveler.controller.UserDetailsNotFoundException
 import it.polito.traveler.controller.UserEmpty
 import it.polito.traveler.dto.TicketPurchasedDTO
 import it.polito.traveler.dto.UserDetailsDTO
+import it.polito.traveler.dto.UserDetailsLiteDTO
 import it.polito.traveler.entity.TicketPurchased
 import it.polito.traveler.entity.UserDetails
 import it.polito.traveler.repository.TicketPurchasedRepository
@@ -44,14 +45,14 @@ class TravelerServiceImpl(@Value("\${server.ticket.token.secret}") val ticketSec
         return user.toDTOUserDetails()
     }
 
-    override fun createProfile(userDetailsDTO: UserDetailsDTO, username : String) {
+    override fun createProfile(userDetailsDTO: UserDetailsLiteDTO, username : String) {
         var user = UserDetails(username, userDetailsDTO.address, userDetailsDTO.dateOfBirth, userDetailsDTO.telephoneNumber);
-
+        // var pattern = "^(\\+\\d\\d[\\-\\s]?)?\\d{10}$".toRegex()
         userDetailsRepository.save(user)
 
     }
 
-    override fun updateProfile(userDetailsDTO: UserDetailsDTO, username : String) {
+    override fun updateProfile(userDetailsDTO: UserDetailsLiteDTO, username : String) {
         var user: UserDetails
         try {
             user = userDetailsRepository.findIdByUsername(username)?.let { userDetailsRepository.findById(it).get() }!!
