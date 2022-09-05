@@ -75,6 +75,8 @@ class TurnstileServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret:
             //Insert transit
             val transit = Transit(null, ticketId, user, turnstileUsername, now)
             transitRepository.save(transit)
+        } else {
+            throw ZoneNotValidException()
         }
     }
 

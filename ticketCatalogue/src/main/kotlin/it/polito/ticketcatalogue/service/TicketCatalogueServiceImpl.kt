@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.*
 import org.apache.kafka.common.requests.DeleteAclsResponse.log
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.kafka.support.KafkaHeaders
@@ -24,6 +25,7 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.web.reactive.function.client.*
 import reactor.core.publisher.Mono
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Service
 class TicketCatalogueServiceImpl(
@@ -70,7 +72,8 @@ class TicketCatalogueServiceImpl(
                 ticketEntity.id!!,
                 tot,
                 Order.Status.PENDING,
-                buyerId
+                buyerId,
+                LocalDateTime.now()
             )
         )
 
@@ -100,11 +103,31 @@ class TicketCatalogueServiceImpl(
 
     }
 
-    override suspend fun getMyOrders(buyerId: Long): Flow<OrderDTO> {
-        return orderRepository.findByBuyerId(buyerId).map {
-            it.ticket = ticketRepository.findAll().filter { it2 -> it2.id==it.ticketId }.single()
-            it
-         }.map { it.toOrderDTO() }
+    override suspend fun getMyOrders(buyerId: Long, since: LocalDateTime?, to: LocalDateTime?): Flow<OrderDTO> {
+
+        return if(since == null && to != null) {
+            // Only end
+            orderRepository.findUserOrdersTo(buyerId, to)
+                .onEach { o -> o.ticket=ticketRepository.findOne(o.ticketId) }
+                .map { it.toOrderDTO() }
+        } else if(since != null && to == null){
+            // Only beginning
+            orderRepository.findUserOrdersSince(buyerId, since)
+                .onEach { o -> o.ticket=ticketRepository.findOne(o.ticketId) }
+                .map { it.toOrderDTO() }
+
+        } else if(since != null && to != null){
+            // Both beginnig and end
+            orderRepository.findUserOrdersSinceTo(buyerId, since, to)
+                .onEach { o -> o.ticket=ticketRepository.findOne(o.ticketId) }
+                .map { it.toOrderDTO() }
+
+        } else {
+            // No period time
+            orderRepository.findByBuyerId(buyerId)
+                .onEach { o -> o.ticket=ticketRepository.findOne(o.ticketId) }
+                .map { it.toOrderDTO() }
+        }
     }
 
     override suspend fun getMyOrder(orderID: Long): OrderDTO {
@@ -132,15 +155,41 @@ class TicketCatalogueServiceImpl(
         }
 
 
-    override suspend fun getAllOrders(): Flow<OrderDTO> {
-        return orderRepository.findAll().map {
+    override suspend fun getAllOrders(since: LocalDateTime?, to: LocalDateTime?): Flow<OrderDTO> {
+
+        return if(since == null && to != null) {
+            // Only end
+            orderRepository.findOrdersTo(to)
+                .onEach { o -> o.ticket=ticketRepository.findOne(o.ticketId) }
+                .map { it.toOrderDTO() }
+        } else if(since != null && to == null){
+            // Only beginning
+            orderRepository.findOrdersSince(since)
+                .onEach { o -> o.ticket=ticketRepository.findOne(o.ticketId) }
+                .map { it.toOrderDTO() }
+
+        } else if(since != null && to != null){
+            // Both beginnig and end
+            orderRepository.findOrdersSinceTo(since, to)
+                .onEach { o -> o.ticket=ticketRepository.findOne(o.ticketId) }
+                .map { it.toOrderDTO() }
+
+
+        } else {
+            // No period time
+            orderRepository.findAll()
+                .onEach { o -> o.ticket=ticketRepository.findOne(o.ticketId) }
+                .map { it.toOrderDTO() }
+        }
+
+        /*return orderRepository.findAll().map {
             it.ticket = ticketRepository.findAll().filter { it2 -> it2.id==it.ticketId }.single()
             it
-        }.map { it.toOrderDTO() }
+        }.map { it.toOrderDTO() }*/
     }
 
-    override suspend fun getOrdersOfUser(buyerId: Long): Flow<OrderDTO> {
-        return getMyOrders(buyerId)
+    override suspend fun getOrdersOfUser(buyerId: Long, since: LocalDateTime?, to: LocalDateTime?): Flow<OrderDTO> {
+        return getMyOrders(buyerId, since, to)
     }
 
     private suspend fun checkUserTicketCompatible(user: UserDetailsDTO, ticket: Ticket): Boolean {

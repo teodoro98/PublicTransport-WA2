@@ -19,5 +19,6 @@ CREATE TABLE IF NOT EXISTS order_order (
                                       status varchar(255) NOT NULL,
                                       buyer_id BIGINT NOT NULL,
                                       ticket_id BIGINT NOT NULL references ticket(id),
+                                      date_purchase TIMESTAMP NOT NULL,
                                       CONSTRAINT pk_order_order_id PRIMARY KEY(id)
 );
