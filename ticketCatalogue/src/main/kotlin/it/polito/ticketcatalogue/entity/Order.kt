@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.PersistenceConstructor
 import org.springframework.data.annotation.Transient
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDateTime
 
 @Table(name = "order_order")
 class Order(
@@ -22,7 +23,9 @@ class Order(
 
     var status: Status,
 
-    var buyerId: Long
+    var buyerId: Long,
+
+    var datePurchase: LocalDateTime
 ) {
 
     @PersistenceConstructor
@@ -37,12 +40,14 @@ class Order(
 
         status: Status,
 
-        buyerId: Long
-    ) : this(id, quantity, null, ticketId, price, status, buyerId)
+        buyerId: Long,
+
+        datePurchase: LocalDateTime
+    ) : this(id, quantity, null, ticketId, price, status, buyerId, datePurchase)
 
 
     fun toOrderDTO(): OrderDTO {
-        return OrderDTO(id, quantity, ticket!!.toTicketDTO(),price,status.toString(),buyerId)
+        return OrderDTO(id, quantity, ticket!!.toTicketDTO(),price,status.toString(),buyerId, datePurchase)
     }
 
     enum class Status {

@@ -41,8 +41,15 @@ class ExceptionHandlerController{
     fun maxRidesReached (ex: MaxRidesReachedException){
         println("Max rides reached")
     }
+
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    @ExceptionHandler(ZoneNotValidException::class)
+    fun zoneNotValid (ex: ZoneNotValidException){
+        println("Zone not valid")
+    }
 }
 
+class ZoneNotValidException(): Exception()
 class TicketNotValidException(): Exception()
 class TypeNotFoundException(): Exception()
 class TurnstileNotFoundException(): Exception()
