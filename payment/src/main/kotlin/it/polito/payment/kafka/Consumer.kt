@@ -1,7 +1,6 @@
 package it.polito.payment.kafka
 
-import it.polito.payment.dto.OrderTopic
-import it.polito.payment.service.PaymentService
+import it.polito.payment.dto.OrderMessage
 import it.polito.payment.service.PaymentServiceImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -25,7 +24,7 @@ class Consumer {
         logger.info("Message received {}", consumerRecord)
         ack.acknowledge()
 
-        val order = consumerRecord.value() as OrderTopic
+        val order = consumerRecord.value() as OrderMessage
         val scope = CoroutineScope(Job())
         scope.launch {
             paymentService.issuePayment(order)

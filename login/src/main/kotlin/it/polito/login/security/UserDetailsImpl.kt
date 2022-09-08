@@ -46,7 +46,7 @@ class UserDetailsImpl(private val id: Long, private val username : String, priva
 
     companion object {
         fun build(user: User): UserDetailsImpl {
-            val authorities: List<GrantedAuthority?> = listOf(SimpleGrantedAuthority(user.role.name))
+            val authorities: List<GrantedAuthority?> = user.role.map { r -> SimpleGrantedAuthority(r.toString()) }.toList()
             return UserDetailsImpl(
                 user.id!!,
                 user.nickname,

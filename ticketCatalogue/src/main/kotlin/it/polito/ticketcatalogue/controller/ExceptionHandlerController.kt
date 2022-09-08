@@ -13,31 +13,31 @@ class ExceptionHandlerController{
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(UserEmpty::class)
-    fun handleUserEmpty(ex: UserEmpty, req: WebRequest?){
+    fun handleUserEmpty(ex: UserEmpty){
         println("user, password and email cannot be empty")
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(InternalServerErrorException::class)
-    fun internalServerError (ex: InternalServerErrorException, req: WebRequest?){
+    fun internalServerError (ex: InternalServerErrorException){
         println("Internal server error in kafka")
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NoTicketFoundException::class)
-    fun noTicketFound (ex: NoTicketFoundException, req: WebRequest?){
+    fun noTicketFound (ex: NoTicketFoundException){
         println("No ticket found")
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(OrderNotFoundException::class)
-    fun orderNotFound (ex: OrderNotFoundException, req: WebRequest?){
+    fun orderNotFound (ex: OrderNotFoundException){
         println("No order found")
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(TicketNotCompatibleException::class)
-    fun ticketNotCompatible (ex: TicketNotCompatibleException, req: WebRequest?){
+    fun ticketNotCompatible (ex: TicketNotCompatibleException){
         println("Ticket not compatible")
     }
 

@@ -52,7 +52,7 @@ class UserRegistrationTests {
         val deadline = LocalDateTime.now()
         val salt = SecureRandom.getInstanceStrong()
         val encoder = BCryptPasswordEncoder(20, salt)
-        val user = User(null, "Mario", "mario@gmail.com",encoder.encode("Pwd123456&"), User.Role.COSTUMER)
+        val user = User(null, "Mario", "mario@gmail.com",encoder.encode("Pwd123456&"), mutableListOf(User.Role.ROLE_COSTUMER))
         val activation = Activation(user, 12345, deadline)
         val userDTO = user.toDTO()
         val activationDTO = activation.toDTO()
@@ -76,6 +76,7 @@ class UserRegistrationTests {
     @Test
     fun constrainsDB() {
 
+        val roles = mutableListOf<User.Role>(User.Role.ROLE_COSTUMER)
         val correctUser      =  UserDTO(null, "Mario", "mario@gmail.com","Pwd123456&", false)
         val sameNameUser     =  UserDTO(null, "Mario", "mario@gmail.com","Pwd123456&", false)
         val emptyNameUser    =  UserDTO(null, "", "mario@gmail.com","Pwd123456&", false)
@@ -89,23 +90,23 @@ class UserRegistrationTests {
         val invalidPassword5 =  UserDTO(null, "Carlo", "carlo@gmail.com","ppwd123456&", false)
 
         //Test correctCase
-        Assertions.assertDoesNotThrow {userServiceImpl.registerUser(correctUser)}
+        Assertions.assertDoesNotThrow {userServiceImpl.registerUser(correctUser, roles)}
 
         //Tests invalid name
-        Assertions.assertThrows(UserNotUnique::class.java)  { userServiceImpl.registerUser(sameNameUser)}
-        Assertions.assertThrows(UserEmpty::class.java)      { userServiceImpl.registerUser(emptyNameUser)}
+        Assertions.assertThrows(UserNotUnique::class.java)  { userServiceImpl.registerUser(sameNameUser, roles)}
+        Assertions.assertThrows(UserEmpty::class.java)      { userServiceImpl.registerUser(emptyNameUser, roles)}
 
         //Tests invalid email
-        Assertions.assertThrows(UserNotUnique::class.java)  { userServiceImpl.registerUser(sameEmailUser)}
-        Assertions.assertThrows(UserEmpty::class.java)      { userServiceImpl.registerUser(emptyEmailUser)}
-        Assertions.assertThrows(EmailNotValid::class.java)  { userServiceImpl.registerUser(invalidEmailUser)}
+        Assertions.assertThrows(UserNotUnique::class.java)  { userServiceImpl.registerUser(sameEmailUser, roles)}
+        Assertions.assertThrows(UserEmpty::class.java)      { userServiceImpl.registerUser(emptyEmailUser, roles)}
+        Assertions.assertThrows(EmailNotValid::class.java)  { userServiceImpl.registerUser(invalidEmailUser, roles)}
 
         //Tests invalid password
-        Assertions.assertThrows(UserPasswordNotStrong::class.java) { userServiceImpl.registerUser(invalidPassword1)}
-        Assertions.assertThrows(UserPasswordNotStrong::class.java) { userServiceImpl.registerUser(invalidPassword2)}
-        Assertions.assertThrows(UserPasswordNotStrong::class.java) { userServiceImpl.registerUser(invalidPassword3)}
-        Assertions.assertThrows(UserPasswordNotStrong::class.java) { userServiceImpl.registerUser(invalidPassword4)}
-        Assertions.assertThrows(UserPasswordNotStrong::class.java) { userServiceImpl.registerUser(invalidPassword5)}
+        Assertions.assertThrows(UserPasswordNotStrong::class.java) { userServiceImpl.registerUser(invalidPassword1, roles)}
+        Assertions.assertThrows(UserPasswordNotStrong::class.java) { userServiceImpl.registerUser(invalidPassword2, roles)}
+        Assertions.assertThrows(UserPasswordNotStrong::class.java) { userServiceImpl.registerUser(invalidPassword3, roles)}
+        Assertions.assertThrows(UserPasswordNotStrong::class.java) { userServiceImpl.registerUser(invalidPassword4, roles)}
+        Assertions.assertThrows(UserPasswordNotStrong::class.java) { userServiceImpl.registerUser(invalidPassword5, roles)}
         }
     }
 

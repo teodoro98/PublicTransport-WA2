@@ -1,9 +1,8 @@
 package it.polito.payment.dto
 
-import it.polito.payment.security.UserDetailsImpl
-
-data class ResultDTO(
+data class ResultMessage(
     val userDetails: UserOrder,
     val orderId: Long,
+    val buyTickets: BuyTicketsDTO,
     val result: Boolean
 )

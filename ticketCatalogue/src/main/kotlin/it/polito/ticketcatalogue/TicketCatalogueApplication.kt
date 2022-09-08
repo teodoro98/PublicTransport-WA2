@@ -1,15 +1,18 @@
 package it.polito.ticketcatalogue
 
-import io.r2dbc.spi.ConnectionFactory
-import org.springframework.beans.factory.annotation.Qualifier
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.info.Info
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.context.annotation.Bean
-import org.springframework.core.io.ClassPathResource
-import org.springframework.r2dbc.connection.init.ConnectionFactoryInitializer
-import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator
 
 @SpringBootApplication
+@OpenAPIDefinition(info = Info(
+    title = "Ticket Catalogue Service",
+    version = "1.0",
+    description = "Any authenticated user can use this service to get all the purchasable tickets and buy any of them." +
+            "They're created by admins in this service"
+)
+)
 class TicketCatalogueApplication
 
 fun main(args: Array<String>) {

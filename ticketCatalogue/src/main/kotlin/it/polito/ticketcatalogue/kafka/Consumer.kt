@@ -1,8 +1,7 @@
 package it.polito.ticketcatalogue.kafka
 
-import it.polito.ticketcatalogue.dto.ResultDTO
+import it.polito.ticketcatalogue.dto.ResultMessage
 import it.polito.ticketcatalogue.security.UserDetailsImpl
-import it.polito.ticketcatalogue.service.TicketCatalogueService
 import it.polito.ticketcatalogue.service.TicketCatalogueServiceImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -27,7 +26,7 @@ class Consumer {
         logger.info("Message received {}", consumerRecord)
         ack.acknowledge()
 
-        val result = consumerRecord.value() as ResultDTO
+        val result = consumerRecord.value() as ResultMessage
         val userDetails = UserDetailsImpl(
             result.userDetails.id,
             result.userDetails.username,

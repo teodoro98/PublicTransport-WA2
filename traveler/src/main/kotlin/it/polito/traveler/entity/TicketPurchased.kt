@@ -1,6 +1,7 @@
 package it.polito.traveler.entity
 
 import it.polito.traveler.dto.TicketPurchasedDTO
+import java.sql.Time
 import java.sql.Timestamp
 import javax.persistence.*
 
@@ -18,7 +19,16 @@ class TicketPurchased (
     var expiry : Timestamp,
 
     @Column(updatable = false, nullable = false)
-    var zoneID : String
+    var zoneID : String,
+
+    @Column(updatable = false, nullable = false)
+    var type : String,
+
+    @Column(updatable = false, nullable = true)
+    var validitytime : Timestamp?,
+
+    @Column(updatable = false, nullable = true)
+    var maxnumberOfRides : Int?
 ) {
 
     @Id

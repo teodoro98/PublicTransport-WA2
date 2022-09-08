@@ -44,6 +44,17 @@ services:
       - '<absolute_projectpath>\postgres\datapy:/var/lib/postgresql/data'
     image: postgres
 
+  db-turnstile:
+      container_name: wa2-db-turnstile-pg
+      ports:
+        - '5436:5432'
+      environment:
+        - POSTGRES_PASSWORD=pwd
+        - PGDATA=/var/lib/postgresql/data/pgdata
+      volumes:
+        - '<absolute_projectpath>\postgres\datapy:/var/lib/postgresql/data'
+      image: postgres
+
   kafka-zookeeper:
     image: confluentinc/cp-zookeeper:7.0.1
     container_name: kafka-zookeeper

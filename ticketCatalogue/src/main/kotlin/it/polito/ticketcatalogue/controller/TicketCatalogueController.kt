@@ -24,8 +24,10 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.web.reactive.function.client.WebClient
 import kotlinx.coroutines.flow.Flow
+import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import java.security.Principal
+import java.time.LocalDateTime
 
 @RestController
 class TicketCatalogueController(
@@ -57,7 +59,7 @@ class TicketCatalogueController(
     suspend fun getMyOrders(principal: Principal): Flow<OrderDTO> {
         val userDetails: UserDetailsImpl = (principal as UsernamePasswordAuthenticationToken).principal as UserDetailsImpl
         val buyerId : Long = userDetails.getId()
-        return catalogue.getMyOrders(buyerId)
+        return catalogue.getMyOrders(buyerId, null, null)
     }
 
     @GetMapping("/orders/{orderId}")
@@ -78,15 +80,35 @@ class TicketCatalogueController(
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin/tickets")
+    suspend fun modifyTicketToCatalogue(@RequestBody ticket: TicketDTO){
+        catalogue.modifyTicketToCatalogue(ticket)
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/orders")
-    suspend fun getAllOrders(): Flow<OrderDTO> {
-        return catalogue.getAllOrders()
+    suspend fun getAllOrders(@RequestParam(required = false)
+                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                             since: LocalDateTime?,
+                             @RequestParam(required = false)
+                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                             to: LocalDateTime?): Flow<OrderDTO> {
+        return catalogue.getAllOrders(since, to)
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/orders/{user-id}")
-    suspend fun getOrdersOfUser(@PathVariable(value="user-id") buyerId: Long): Flow<OrderDTO> {
-        return catalogue.getOrdersOfUser(buyerId)
+    suspend fun getOrdersOfUser(@PathVariable(value="user-id") buyerId: Long,
+                                @RequestParam(required = false)
+                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                since: LocalDateTime?,
+                                @RequestParam(required = false)
+                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                                to: LocalDateTime?
+    ): Flow<OrderDTO> {
+        return catalogue.getOrdersOfUser(buyerId, since, to)
+
 
     }
 }

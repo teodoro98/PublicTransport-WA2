@@ -9,6 +9,8 @@ import it.polito.login.entity.User
 import it.polito.login.repository.*
 import it.polito.login.security.JwtUtils
 import org.apache.commons.validator.EmailValidator
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -45,24 +47,43 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
     @Autowired
     private lateinit var jwtUtils: JwtUtils
 
+    @Value("\${server.users.activation.enable}")
+    private lateinit var activationEnabled: String
+    @Value("\${server.users.activation.expire}")
+    private lateinit var activationExpire: String
+
     private val encodedSecret: String = Base64.getEncoder().encodeToString(clearSecret.toByteArray())
     private val algorithm: SignatureAlgorithm = SignatureAlgorithm.HS256
 
+    private var logger: Logger = LoggerFactory.getLogger(UserServiceImpl::class.java)
 
-    override fun registerUser(user: UserDTO): Pair<UserProvDTO, Long> {
-        this.validateUserData(user)
-        val deadline = LocalDateTime.now().plusSeconds(20)
+    override fun registerUser(user: UserDTO, roles: MutableList<User.Role>): Pair<UserProvDTO?, Long?> {
+        this.validateUserData(user, roles)
+        val deadline = LocalDateTime.now().plusSeconds(activationExpire.toLong())
         try {
             val encoder = passwordEncoder
             val pwd = encoder.encode(user.password)
-            val u = userRepository.save(User(null, user.nickname, user.email, pwd, User.Role.COSTUMER))
-            val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
+            var u = User(null, user.nickname, user.email, pwd, roles)
+            if(activationEnabled.toBoolean()) {
+                // Users needs to be activated according to DTO
+                u.active = user.active
+                logger.info("User ${user.nickname} ${if (!u.active) "needs" else "doesn't need"} to be activated")
+            } else {
+                logger.info("User activation disabled by application settings")
+                logger.info("User ${user.nickname} doesn't need to be activated")
+                u.active = true
+            }
+            u = userRepository.save(u)
 
-            //u.active = true
+            if(!u.active) {
+                val a = activationRepository.save(Activation(u, abs(Random().nextLong()), deadline))
+                u.activation = a
+                userRepository.save(u)
+                return Pair(UserProvDTO(a.id, u.email), a.token)
+            }
 
-            u.activation = a
-            userRepository.save(u)
-            return Pair(UserProvDTO(a.id, u.email), a.token)
+            return Pair(null, null)
+
         } catch(ex : DataIntegrityViolationException) {
             throw UserNotUnique()
         }
@@ -88,9 +109,16 @@ class UserServiceImpl(@Value("\${server.ticket.token.secret}") clearSecret: Stri
 
     }
 
-    override fun validateUserData(user: UserDTO) {
+    override fun validateUserData(user: UserDTO, roles: MutableList<User.Role>) {
         if(user.nickname.isEmpty() || user.password.isEmpty() || user.email.isEmpty()) throw UserEmpty()
         if(!EmailValidator.getInstance().isValid(user.email)) throw EmailNotValid()
+        if(roles.contains(User.Role.ROLE_COSTUMER) || roles.contains(User.Role.ROLE_ADMIN)) {
+            //val condition = if (roles.contains(User.Role.ROLE_COSTUMER)) User.Role.ROLE_COSTUMER else User.Role.ROLE_ADMIN
+            val result = userRepository.findAll().count { u ->
+                (u.role.contains(User.Role.ROLE_COSTUMER) || u.role.contains(User.Role.ROLE_ADMIN)) && u.email == user.email
+            }
+            if(result > 0) throw UserNotUnique()
+        }
         if(!this.validatePassword(user.password)) throw UserPasswordNotStrong()
     }
 

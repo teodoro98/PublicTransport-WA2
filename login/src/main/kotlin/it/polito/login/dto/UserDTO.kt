@@ -5,6 +5,6 @@ data class UserDTO(
     val nickname:String,
     val email:String,
     val password: String,
-    val active: Boolean
+    var active: Boolean
     )
 

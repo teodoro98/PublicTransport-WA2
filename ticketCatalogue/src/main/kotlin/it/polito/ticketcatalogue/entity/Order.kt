@@ -5,8 +5,8 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.PersistenceConstructor
 import org.springframework.data.annotation.Transient
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDateTime
 
-// TODO aggiungere lista di ticket acquistati
 @Table(name = "order_order")
 class Order(
     @Id
@@ -15,15 +15,17 @@ class Order(
     var quantity: Int,
 
     @Transient
-    var type: Ticket?,
+    var ticket: Ticket?,
 
-    var typeId: Long,
+    var ticketId: Long,
 
     var price: Double,
 
     var status: Status,
 
-    var buyerId: Long
+    var buyerId: Long,
+
+    var datePurchase: LocalDateTime
 ) {
 
     @PersistenceConstructor
@@ -32,18 +34,20 @@ class Order(
 
         quantity: Int,
 
-        typeId: Long,
+        ticketId: Long,
 
         price: Double,
 
         status: Status,
 
-        buyerId: Long
-    ) : this(id, quantity, null, typeId, price, status, buyerId)
+        buyerId: Long,
+
+        datePurchase: LocalDateTime
+    ) : this(id, quantity, null, ticketId, price, status, buyerId, datePurchase)
 
 
     fun toOrderDTO(): OrderDTO {
-        return OrderDTO(id, quantity, type!!.type,price,status.toString(),buyerId)
+        return OrderDTO(id, quantity, ticket!!.toTicketDTO(),price,status.toString(),buyerId, datePurchase)
     }
 
     enum class Status {

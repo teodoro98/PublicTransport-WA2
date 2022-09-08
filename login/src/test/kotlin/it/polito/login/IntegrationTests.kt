@@ -143,7 +143,7 @@ class IntegrationTests {
 
     }
 
-    @Test
+    /*@Test
     fun pruneExpire() {
         val baseUrl = "http://localhost:$port"
         val correctRequest = HttpEntity(UserDTO(null, "Mario", "mario@gmail.com", "Pwd123456&", false))
@@ -156,7 +156,7 @@ class IntegrationTests {
         Assertions.assertEquals(0,userRepository.findAll().count())
         Assertions.assertEquals(0,activationRepository.findAll().count())
 
-    }
+    }*/
 
     @Test
     fun loginTest() {
