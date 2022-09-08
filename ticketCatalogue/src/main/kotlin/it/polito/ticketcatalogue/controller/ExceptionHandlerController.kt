@@ -41,6 +41,12 @@ class ExceptionHandlerController{
         println("Ticket not compatible")
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(TicketNotExistsException::class)
+    fun ticketNotCompatible (ex: TicketNotExistsException){
+        println("Ticket not exists")
+    }
+
 }
 
 class UserEmpty() : Exception()
@@ -48,6 +54,7 @@ class InternalServerErrorException() : Exception()
 class NoTicketFoundException() : Exception()
 class OrderNotFoundException(): Exception()
 class TicketNotCompatibleException(): Exception()
+class TicketNotExistsException(): Exception()
 
 
 

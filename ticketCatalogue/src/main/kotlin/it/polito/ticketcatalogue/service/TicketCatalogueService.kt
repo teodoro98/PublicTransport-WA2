@@ -13,7 +13,7 @@ interface TicketCatalogueService {
 
     suspend fun getCatalogue() : Flow<TicketDTO>
 
-    suspend fun purchaseTickets(userDetails: UserDetailsImpl, ticketId: Long, requestOrder: RequestOrderDTO) : Long
+    suspend fun purchaseTickets(userDetails: UserDetailsImpl, ticketId: Long, requestOrder: RequestOrderDTO) : OrderDTO
 
     suspend fun getMyOrders(buyerId: Long, since: LocalDateTime?, to: LocalDateTime?) : Flow<OrderDTO>
 

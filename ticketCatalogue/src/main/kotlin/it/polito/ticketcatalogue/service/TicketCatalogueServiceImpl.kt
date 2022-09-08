@@ -3,6 +3,7 @@ package it.polito.ticketcatalogue.service
 import it.polito.ticketcatalogue.controller.InternalServerErrorException
 import it.polito.ticketcatalogue.controller.OrderNotFoundException
 import it.polito.ticketcatalogue.controller.TicketNotCompatibleException
+import it.polito.ticketcatalogue.controller.TicketNotExistsException
 import it.polito.ticketcatalogue.dto.*
 import it.polito.ticketcatalogue.entity.Order
 import it.polito.ticketcatalogue.entity.Ticket
@@ -47,11 +48,15 @@ class TicketCatalogueServiceImpl(
         return ticketRepository.findAll().map { it.toTicketDTO() }
     }
 
-    override suspend fun purchaseTickets(userDetails: UserDetailsImpl, ticketId: Long, requestOrder: RequestOrderDTO): Long {
+    override suspend fun purchaseTickets(userDetails: UserDetailsImpl, ticketId: Long, requestOrder: RequestOrderDTO): OrderDTO {
         //val ticketEntity = ticketRepository.findOne(ticketId)
         //val ticketEntity = ticketRepository.findById(ticketId)
 
-        val ticketEntity = ticketRepository.findAll().filter { it.id == ticketId }.single()
+        val ticketEntity = ticketRepository.findAll().filter { it.id == ticketId }
+            .onEmpty {
+                throw TicketNotExistsException()
+            }
+            .single()
 
         val buyerId = userDetails.getId()
 
@@ -62,7 +67,6 @@ class TicketCatalogueServiceImpl(
         }
 
  */
-
         val tot = ticketEntity.price * requestOrder.quantity
         val orderEntity = orderRepository.save(
             Order(
@@ -99,7 +103,7 @@ class TicketCatalogueServiceImpl(
             throw InternalServerErrorException()
         }
 
-        return orderEntity.id ?: 0
+        return orderEntity.toOrderDTO()
 
     }
 

@@ -48,7 +48,7 @@ class TicketCatalogueController(
 
     @PostMapping("/shop/{ticketid}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    suspend fun purchaseTickets(@PathVariable("ticketid") ticketid: Long, @RequestBody requestOrder: RequestOrderDTO, principal: Principal): Long {
+    suspend fun purchaseTickets(@PathVariable("ticketid") ticketid: Long, @RequestBody requestOrder: RequestOrderDTO, principal: Principal): OrderDTO {
         val userDetails: UserDetailsImpl = (principal as UsernamePasswordAuthenticationToken).principal as UserDetailsImpl
 
         return catalogue.purchaseTickets(userDetails, ticketid, requestOrder)
